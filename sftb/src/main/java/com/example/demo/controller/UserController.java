@@ -12,10 +12,15 @@ public class UserController { // UserController 클래스 선언
     @Autowired // 의존성 주입
     private UserService userService;
 
-    @PostMapping("/signup") // POST 요청 매핑
-    public ResponseEntity<?> registerUser(@RequestBody User user) { 
-    	// registerUser 메서드 선언
+    @PostMapping("/SignUp") // POST 요청 매핑
+    public ResponseEntity<?> registerUser(@RequestBody User user) { // registerUser 메서드 선언
+    	
     	userService.saveUser(user); // 사용자 저장
-        return ResponseEntity.ok("User registered successfully"); // 응답 반환
+        return ResponseEntity.ok(user); // 응답 반환
+    }
+    
+    @GetMapping("/SignUp")
+    public ResponseEntity<String> getSignUpPage() {
+        return ResponseEntity.ok("SignUp page");
     }
 }

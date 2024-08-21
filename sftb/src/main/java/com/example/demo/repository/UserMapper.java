@@ -6,7 +6,6 @@ import com.example.demo.entity.User;
 
 @Mapper //Mybatis가 이 인터페이스를 매퍼로 인식하게 함
 public interface UserMapper {
-    @Insert("INSERT INTO customers (UserID, StudentID, Password, UserName, Email) "
-    		+ "VALUES (#{UserID}, #{StudentID}, #{Password}, #{UserName}, #{Email})") //SQL INSERT문 정의
+    @Insert("INSERT INTO customers (UserID, StudentID, Password, UserName, Email) VALUES (#{userID}, #{studentID}, #{password}, #{userName}, #{email})") //SQL INSERT문 정의
     void insertUser(User user); //User객체를 데베에 삽입
 }

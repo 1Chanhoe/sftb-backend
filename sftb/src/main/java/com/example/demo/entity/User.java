@@ -1,49 +1,56 @@
 package com.example.demo.entity;
-//데이터베이스 테이블과 매핑되는 클래스, 이 클래스는 데이터베이스 테이블의 구조를 정의한다.
+
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+@Data
+@Getter
+@Setter
 public class User {
-    private String UserID; // 아이디
-    private String StudentID; // 학번
-    private String Password; // 비밀번호
-    private String UserName; // 이름
-    private String Email; // 이메일
+    private String userID; // 아이디
+    private String studentID; // 학번
+    private String password; // 비밀번호
+    private String userName; // 이름
+    private String email; // 이메일
+    
+	public String getUserID() {
+		return userID;
+	}
 
-    public String getUserID() {
-        return UserID;
-    }
+	public void setUserID(String userID) {
+		this.userID = userID;
+	}
 
-    public void setUserID(String UserID) {
-        this.UserID = UserID;
-    }
+	public String getStudentID() {
+		return studentID;
+	}
 
-    public String getStudentID() {
-        return StudentID;
-    }
+	public void setStudentID(String studentID) {
+		this.studentID = studentID;
+	}
 
-    public void setStudentID(String StudentID) {
-        this.StudentID = StudentID;
-    }
+	public String getPassword() {
+		return password;
+	}
 
-    public String getPassword() {
-        return Password;
-    }
+	public void setPassword(String password) {
+		this.password = password;
+	}
 
-    public void setPasswd(String Password) {
-        this.Password = Password;
-    }
+	public String getEmail() {
+		return email;
+	}
 
-    public String getUserName() {
-        return UserName;
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	
+	public String getUserName() {
+        return userName;
     }
-
-    public void setUserName(String UserName) {
-        this.UserName = UserName;
-    }
-
-    public String getEmail() {
-        return Email;
-    }
-
-    public void setEmail(String Email) {
-        this.Email = Email;
-    }
+	
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+    
 }
