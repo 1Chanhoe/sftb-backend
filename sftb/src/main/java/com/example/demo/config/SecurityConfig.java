@@ -11,12 +11,17 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.security.config.http.SessionCreationPolicy; // Spring Security의 SessionCreationPolicy를 import
+import org.springframework.security.config.http.SessionCreationPolicy;
 import java.util.Arrays;
+import com.example.demo.service.CustomUserDetailsService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -26,25 +31,34 @@ public class SecurityConfig {
                 config.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
                 config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                 config.setAllowedHeaders(Arrays.asList("*"));
-                config.setAllowCredentials(true);
+                config.setAllowCredentials(true); 
                 return config;
             }))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authorizeRequests ->
                 authorizeRequests
-                    .anyRequest().permitAll()
+                    .requestMatchers("/", "/SignUp", "/SearchIdPage", "/SearchPwPage").permitAll()
+                    .requestMatchers("/api/auth/**").permitAll()
+                    .requestMatchers("/api/posts").permitAll()
+                    .anyRequest().authenticated()
             )
-            .sessionManagement(session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 여기서 Spring Security의 SessionCreationPolicy 사용
-            );
+            .sessionManagement(session -> session
+            		.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+            )
+            .userDetailsService(customUserDetailsService); //스프링 시큐리티에서 사용자 정보를 관리하고, 이를 바탕으로 인증과 권한 부여를 수행하는 클래스
 
         return http.build();
     }
-    
+
+
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+
+
     
     @Bean
     public WebMvcConfigurer corsConfigurer() {
@@ -56,6 +70,7 @@ public class SecurityConfig {
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
+                		
             }
         };
     }
