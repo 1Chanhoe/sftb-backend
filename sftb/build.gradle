@@ -25,19 +25,40 @@ repositories {
 }
 
 dependencies {
+	//Spring Boot dependencies
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
-	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	
+	//MyBatis
+	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
+	
+	//Lombok
 	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	
+	//Devtools for hot reloading during development
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	
+	//MariaDB JDBC driver
+	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+	
+	//JSON Web Token (JWT) for authentication
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
-	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+	
+	 // Jakarta Persistence API (replaces javax.persistence)
+    implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
+	
+	// Jakarta Servlet API (replaces javax.servlet)
+    providedRuntime 'jakarta.servlet:jakarta.servlet-api:5.0.0'
+	
+	//얘넨 아직모름
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-	annotationProcessor 'org.projectlombok:lombok'
 	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+	
+	//Testing dependencies
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.3'
 	testImplementation 'org.springframework.security:spring-security-test'
