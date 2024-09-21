@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+
 import com.example.demo.dto.ResetPasswordRequest;
 import com.example.demo.entity.User;
 import com.example.demo.service.UserService;
@@ -14,6 +15,13 @@ import org.springframework.http.HttpStatus;
 import java.util.HashMap;
 import java.util.Map;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+
+
 @RestController
 @RequestMapping("/api/auth")
 public class UserController {
@@ -21,6 +29,24 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    
+    @PostMapping("/logout")
+    public ResponseEntity<?> logoutUser(HttpServletRequest request, HttpServletResponse response) {
+        // 세션 무효화
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        
+        // JSESSIONID 쿠키 삭제
+        Cookie cookie = new Cookie("JSESSIONID", null);
+        cookie.setPath("/"); // 쿠키 경로 설정
+        cookie.setHttpOnly(true); // 보안 설정
+        cookie.setMaxAge(0); // 쿠키 만료 시간 0으로 설정 (즉시 삭제)
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok("Logged out successfully");
+        }
 
     @PostMapping("/SignUp")
     public ResponseEntity<?> registerUser(@RequestBody User user) {
@@ -33,7 +59,10 @@ public class UserController {
             errorResponse.put("message", e.getMessage());
             return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
         }
+
+
     }
+
 
     // 로그인 요청을 처리하는 메서드
     @PostMapping("/login")
@@ -103,5 +132,6 @@ public class UserController {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("message", ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+
     }
 }

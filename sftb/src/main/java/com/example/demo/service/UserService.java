@@ -1,7 +1,9 @@
 package com.example.demo.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+
+import org.springframework.beans.factory.annotation.Autowired; //Spring Autowired 어노테이션
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder; //Spring Security 패스워드 인코더
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.example.demo.entity.User;
@@ -58,7 +60,7 @@ public class UserService {
         // MyBatis를 사용하여 사용자 저장
         userMapper.insertUser(user);
         logger.info("User signed up successfully with userID: {}", user.getUserID());
-    }
+    	}
 
     // 로그인 메서드, 사용자 ID 찾기, 비밀번호 찾기 및 비밀번호 변경 메서드는 기존과 동일합니다.
 
@@ -120,6 +122,7 @@ public class UserService {
             return true;
         }
         logger.warn("Failed to reset password for userID: {}", userID);
+
         return false;
     }
 }

@@ -42,3 +42,4 @@ public interface UserMapper {
     @Select("SELECT COUNT(*) > 0 FROM customers WHERE Email = #{email}")
     boolean existsByEmail(@Param("email") String email);
 }
+
