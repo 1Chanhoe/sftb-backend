@@ -14,19 +14,15 @@ public interface PostMapper {
     @Options(useGeneratedKeys = true, keyProperty = "creSeq") // AUTO_INCREMENT 컬럼이 있는 경우
     void insertPost(Post post);
 
-    // 게시물 ID로 게시물 조회
-    @Select("SELECT * FROM CerInfo_Post WHERE Cre_seq = #{creSeq}")
-    Post findById(@Param("creSeq") Long creSeq);
-
-    // 회원 ID로 작성된 모든 게시물 조회
-    @Select("SELECT * FROM CerInfo_Post WHERE Member_ID = #{userName}")
-    List<Post> findByUserName(@Param("userName") String userName);
-
-    // 게시물 수정
-    @Update("UPDATE CerInfo_Post SET Title = #{title}, Content = #{content}, Update_At = NOW() WHERE Cre_seq = #{creSeq}")
-    void updatePost(Post post);
-
-    // 게시물 삭제
-    @Delete("DELETE FROM CerInfo_Post WHERE Cre_seq = #{creSeq}")
-    void deletePost(@Param("creSeq") Long creSeq);
+    // 게시물 목록 조회
+    @Select("SELECT * FROM CerInfo_Post ORDER BY Create_At DESC")
+    @Results({
+        @Result(property = "creSeq", column = "CreSeq"),
+        @Result(property = "title", column = "Title"),
+        @Result(property = "userName", column = "Member_ID"),
+        @Result(property = "content", column = "Content"),
+        @Result(property = "viewCount", column = "ViewCount"),
+        @Result(property = "createAt", column = "Create_At")
+    })
+    List<Post> findAllPosts();
 }
