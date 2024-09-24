@@ -6,7 +6,7 @@ import com.example.demo.entity.Post;
 import java.util.List;
 
 @Mapper
-public interface PostMapper {
+public interface PostMapper { //주주석
 
     // 게시물 작성
     @Insert("INSERT INTO CerInfo_Post (Title, Member_ID, Content, ViewCount, Create_At) " +
@@ -24,5 +24,6 @@ public interface PostMapper {
         @Result(property = "viewCount", column = "ViewCount"),
         @Result(property = "createAt", column = "Create_At")
     })
+    
     List<Post> findAllPosts();
 }
