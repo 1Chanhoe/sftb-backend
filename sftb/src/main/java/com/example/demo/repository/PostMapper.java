@@ -6,24 +6,26 @@ import com.example.demo.entity.Post;
 import java.util.List;
 
 @Mapper
-public interface PostMapper { //주주석
+public interface PostMapper {
 
     // 게시물 작성
-    @Insert("INSERT INTO CerInfo_Post (Title, Member_ID, Content, ViewCount, Create_At) " +
-            "VALUES (#{title}, #{userName}, #{content}, #{viewCount}, NOW())")
-    @Options(useGeneratedKeys = true, keyProperty = "creSeq") // AUTO_INCREMENT 컬럼이 있는 경우
+    @Insert("INSERT INTO post (Title, Member_ID, Content, ViewCount, Create_At, Board_ID) " +
+            "VALUES (#{title}, #{userName}, #{content}, #{viewCount}, NOW(), #{boardId})")
+    @Options(useGeneratedKeys = true, keyProperty = "postId") // AUTO_INCREMENT 컬럼이 있는 경우
     void insertPost(Post post);
 
     // 게시물 목록 조회
-    @Select("SELECT * FROM CerInfo_Post ORDER BY Create_At DESC")
+    @Select("SELECT * FROM post ORDER BY Create_At DESC")
     @Results({
-        @Result(property = "creSeq", column = "CreSeq"),
+        @Result(property = "postId", column = "Post_ID"),
         @Result(property = "title", column = "Title"),
         @Result(property = "userName", column = "Member_ID"),
         @Result(property = "content", column = "Content"),
         @Result(property = "viewCount", column = "ViewCount"),
-        @Result(property = "createAt", column = "Create_At")
+        @Result(property = "createAt", column = "Create_At"),
+        @Result(property = "updateAt", column = "Update_At"),
+        @Result(property = "boardId", column = "Board_ID")
     })
-    
     List<Post> findAllPosts();
 }
+
