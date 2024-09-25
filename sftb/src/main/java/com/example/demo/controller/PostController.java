@@ -21,8 +21,10 @@ public class PostController {
     public ResponseEntity<?> createPost(@RequestBody PostRequest postRequest) {
         Post post = new Post();
         post.setTitle(postRequest.getTitle());
-        post.setUserName(postRequest.getUserName()); // memberId를 userName으로 변경
+        post.setUserName(postRequest.getUserName()); // Member_ID를 userName으로 사용
         post.setContent(postRequest.getContent());
+        post.setBoardId(postRequest.getBoardId()); // boardId 설정
+        post.setViewCount(0); // 초기 조회수 설정
 
         postService.createPost(post);
 
