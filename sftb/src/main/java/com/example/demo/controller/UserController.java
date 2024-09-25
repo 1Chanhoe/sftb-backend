@@ -1,11 +1,13 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.ResetPasswordRequest; // DTO 클래스 임포트
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.demo.entity.User;
 import com.example.demo.service.UserService;
+
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,11 +44,13 @@ public class UserController {
         response.addCookie(cookie);
 
         return ResponseEntity.ok("Logged out successfully");
+
     }
+
     
     @PostMapping("/SignUp")
     public ResponseEntity<?> registerUser(@RequestBody User user) {
-        userService.saveUser(user);
+//        userService.saveUser(user);
         return ResponseEntity.ok(user);
     }
 
