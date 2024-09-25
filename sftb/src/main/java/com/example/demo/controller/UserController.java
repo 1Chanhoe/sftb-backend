@@ -1,6 +1,5 @@
 package com.example.demo.controller;
 
-
 import com.example.demo.dto.ResetPasswordRequest;
 import com.example.demo.entity.User;
 import com.example.demo.service.UserService;
@@ -15,10 +14,12 @@ import org.springframework.http.HttpStatus;
 import java.util.HashMap;
 import java.util.Map;
 
+
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+
 
 
 
@@ -46,8 +47,10 @@ public class UserController {
         response.addCookie(cookie);
 
         return ResponseEntity.ok("Logged out successfully");
-        }
 
+    }
+
+  
     @PostMapping("/SignUp")
     public ResponseEntity<?> registerUser(@RequestBody User user) {
         try {
@@ -64,7 +67,6 @@ public class UserController {
     }
 
 
-    // 로그인 요청을 처리하는 메서드
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody User loginRequest) {
         logger.info("Attempting to log in with userID: {}", loginRequest.getUserID());
