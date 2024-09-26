@@ -1,26 +1,23 @@
 package com.example.demo.controller;
 
-
 import com.example.demo.dto.ResetPasswordRequest;
 import com.example.demo.entity.User;
 import com.example.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.apache.coyote.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -37,7 +34,7 @@ public class UserController {
         if (session != null) {
             session.invalidate();
         }
-        
+
         // JSESSIONID 쿠키 삭제
         Cookie cookie = new Cookie("JSESSIONID", null);
         cookie.setPath("/"); // 쿠키 경로 설정
@@ -46,7 +43,9 @@ public class UserController {
         response.addCookie(cookie);
 
         return ResponseEntity.ok("Logged out successfully");
-        }
+
+    }
+
 
     @PostMapping("/SignUp")
     public ResponseEntity<?> registerUser(@RequestBody User user) {
@@ -59,10 +58,7 @@ public class UserController {
             errorResponse.put("message", e.getMessage());
             return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
         }
-
-
     }
-
 
     // 로그인 요청을 처리하는 메서드
     @PostMapping("/login")
@@ -132,6 +128,6 @@ public class UserController {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("message", ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-
     }
 }
+
