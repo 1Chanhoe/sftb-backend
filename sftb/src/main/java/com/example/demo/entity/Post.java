@@ -4,18 +4,18 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "CerInfo_Post") // 테이블 이름 지정
+@Table(name = "post") // 테이블 이름을 'post'로 지정
 public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // 기본 키 자동 생성
-    @Column(name = "Cre_seq") // DB 테이블의 컬럼명과 매핑
-    private Long creSeq; // 게시물 고유 번호
+    @Column(name = "Post_ID") // DB 테이블의 컬럼명과 매핑
+    private Long postId; // 게시물 고유 번호
 
     @Column(name = "Title", nullable = false, length = 100) // 제목 필드
     private String title; // 게시물 제목
 
-    @Column(name = "Member_ID", nullable = false, length = 10) // 작성자 ID
+    @Column(name = "Member_ID", nullable = false, length = 20) // 작성자 ID
     private String userName; // 작성자의 회원 ID (로그인된 사용자)
 
     @Column(name = "Content", nullable = false, columnDefinition = "TEXT") // 내용 필드
@@ -30,13 +30,16 @@ public class Post {
     @Column(name = "Update_At") // 수정 시간 필드 (NULL 가능)
     private LocalDateTime updateAt; // 수정 시간
 
-    // Getter and Setter for creSeq
-    public Long getCreSeq() {
-        return creSeq;
+    @Column(name = "Board_ID", nullable = false) // 게시판 ID 필드 (NOT NULL)
+    private Integer boardId; // 게시판 ID (외래키)
+
+    // Getter and Setter for postId
+    public Long getPostId() {
+        return postId;
     }
 
-    public void setCreSeq(Long creSeq) {
-        this.creSeq = creSeq;
+    public void setPostId(Long postId) {
+        this.postId = postId;
     }
 
     // Getter and Setter for title
@@ -91,6 +94,15 @@ public class Post {
 
     public void setUpdateAt(LocalDateTime updateAt) {
         this.updateAt = updateAt;
+    }
+
+    // Getter and Setter for boardId
+    public Integer getBoardId() {
+        return boardId;
+    }
+
+    public void setBoardId(Integer boardId) {
+        this.boardId = boardId;
     }
 
     // 생성된 시점에 기본적으로 작성 시간을 현재 시간으로 설정

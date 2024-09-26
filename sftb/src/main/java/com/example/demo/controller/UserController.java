@@ -19,6 +19,7 @@ import jakarta.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 
+
 @RestController
 @RequestMapping("/api/auth")
 public class UserController {
@@ -45,9 +46,11 @@ public class UserController {
 
         return ResponseEntity.ok("Logged out successfully");
 
+
+
     }
 
-
+  
     @PostMapping("/SignUp")
     public ResponseEntity<?> registerUser(@RequestBody User user) {
         try {
@@ -61,7 +64,7 @@ public class UserController {
         }
     }
 
-    // 로그인 요청을 처리하는 메서드
+
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody User loginRequest) {
         logger.info("Attempting to log in with userID: {}", loginRequest.getUserID());
