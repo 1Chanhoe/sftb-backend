@@ -20,6 +20,7 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    
     // 회원가입 메서드 (ID, 학번, 이메일 중복 확인 로직 MyBatis 사용)
     @Transactional
     public void signUp(User user) throws BadRequestException {

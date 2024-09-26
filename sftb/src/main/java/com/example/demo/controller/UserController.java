@@ -34,6 +34,7 @@ public class UserController {
         if (session != null) {
             session.invalidate();
         }
+        
 
         // JSESSIONID 쿠키 삭제
         Cookie cookie = new Cookie("JSESSIONID", null);
