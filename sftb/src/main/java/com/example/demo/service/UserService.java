@@ -63,6 +63,10 @@ public class UserService {
         // MyBatis를 사용하여 사용자 저장
         userMapper.insertUser(user);
         logger.info("User signed up successfully with userID: {}", user.getUserID());
+        
+     // 경험치 부여 (40%의 전체 경험치, 예: 100 포인트를 기준으로)
+        int experiencePoints = (int) (100 * 0.4); // 예를 들어, 전체 경험치가 100인 경우 40%를 부여
+        addExperiencePoints(user.getId(), experiencePoints); // 사용자 ID와 부여할 경험치 전달
     }
 
     // 로그인 메서드, 사용자 ID 찾기, 비밀번호 찾기 및 비밀번호 변경 메서드는 기존과 동일합니다.
@@ -127,5 +131,14 @@ public class UserService {
         logger.warn("Failed to reset password for userID: {}", userID);
         return false;
     }
-}
+    
+    // 경험치 추가 메서드
+    public void addExperiencePoints(Long userId, int points) {
+        User user = userMapper.findByUserId(userId)
+            .orElseThrow(() -> new UserNotFoundException(userId)); // 사용자 조회
 
+        user.setExperiencePoints(user.getExperiencePoints() + points); // 경험치 추가
+        userMapper.save(user); // 사용자 정보 저장
+        logger.info("Added {} experience points to userID: {}", points, userId); // 로그 기록
+    }
+}

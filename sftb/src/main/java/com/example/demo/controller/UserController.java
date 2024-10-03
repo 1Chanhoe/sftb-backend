@@ -134,4 +134,3 @@ public class UserController {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 }
-
