@@ -1,12 +1,12 @@
 package com.example.demo.service;
 
 
-import org.springframework.beans.factory.annotation.Autowired; //Spring Autowired 어노테이션
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder; //Spring Security 패스워드 인코더
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.example.demo.entity.User;
@@ -25,45 +25,48 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-//    // 회원가입 메서드 (ID, 학번, 이메일 중복 확인 로직 MyBatis 사용)
-//    @Transactional
-//    public void signUp(User user) throws BadRequestException {
-//        StringBuilder errorMessage = new StringBuilder();
-//
-//        boolean hasError = false;
-//
-//
-//        // 학번 중복 확인
-//        if (userMapper.existsByStudentID(user.getStudentID())) {
-//            errorMessage.append("Student ID already exists. ");
-//            hasError = true;
-//        }
-//        
-//        // ID 중복 확인
-//        if (userMapper.existsByUserID(user.getUserID())) {
-//            errorMessage.append("User ID already exists. ");
-//            hasError = true;
-//        }
-//
-//        // 이메일 중복 확인
-//        if (userMapper.existsByEmail(user.getEmail())) {
-//            errorMessage.append("Email already exists. ");
-//            hasError = true;
-//        }
-//
-//        // 오류가 있는 경우 예외 발생
-//        if (hasError) {
-//            logger.warn("Failed to register user: {}", errorMessage.toString().trim());
-//            throw new BadRequestException(errorMessage.toString().trim());
-//        }
-//
-//        // 비밀번호 암호화
-//        user.setPassword(passwordEncoder.encode(user.getPassword()));
-//
-//        // MyBatis를 사용하여 사용자 저장
-//        userMapper.insertUser(user);
-//        logger.info("User signed up successfully with userID: {}", user.getUserID());
-//    	}
+
+    
+    // 회원가입 메서드 (ID, 학번, 이메일 중복 확인 로직 MyBatis 사용)
+    @Transactional
+    public void signUp(User user) throws BadRequestException {
+        StringBuilder errorMessage = new StringBuilder();
+
+        boolean hasError = false;
+
+
+        // 학번 중복 확인
+        if (userMapper.existsByStudentID(user.getStudentID())) {
+            errorMessage.append("Student ID already exists. ");
+            hasError = true;
+        }
+        
+        // ID 중복 확인
+        if (userMapper.existsByUserID(user.getUserID())) {
+            errorMessage.append("User ID already exists. ");
+            hasError = true;
+        }
+
+        // 이메일 중복 확인
+        if (userMapper.existsByEmail(user.getEmail())) {
+            errorMessage.append("Email already exists. ");
+            hasError = true;
+        }
+
+        // 오류가 있는 경우 예외 발생
+        if (hasError) {
+            logger.warn("Failed to register user: {}", errorMessage.toString().trim());
+            throw new BadRequestException(errorMessage.toString().trim());
+        }
+
+        // 비밀번호 암호화
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        // MyBatis를 사용하여 사용자 저장
+        userMapper.insertUser(user);
+        logger.info("User signed up successfully with userID: {}", user.getUserID());
+    }
+
 
     // 로그인 메서드, 사용자 ID 찾기, 비밀번호 찾기 및 비밀번호 변경 메서드는 기존과 동일합니다.
 
@@ -129,3 +132,4 @@ public class UserService {
         return false;
     }
 }
+

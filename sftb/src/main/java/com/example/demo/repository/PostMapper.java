@@ -27,5 +27,20 @@ public interface PostMapper {
         @Result(property = "boardId", column = "Board_ID")
     })
     List<Post> findAllPosts();
+   
+ // 게시물 수정
+    @Update("UPDATE post SET Title = #{title}, content = #{content}, Update_At = NOW() WHERE Post_ID = #{postId}")
+    void updatePost(@Param("postId") Long postId, @Param("title") String title, @Param("content") String content);
+
+
+    // 게시물 조회
+    @Select("SELECT * FROM post WHERE Post_ID = #{postId}")
+    Post findPostById(@Param("postId") Long postId);
+    
+ 
+
+
+
+    
 }
 
