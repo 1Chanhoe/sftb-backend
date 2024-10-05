@@ -7,8 +7,8 @@ public class CommentRequest {
     private String content;
     private String memberId; // 작성자 ID 추가 (필요한 경우)
     private Long parentId;
+    
     // Getters and Setters
-
     public Long getPostId() {
         return postId;
     }
