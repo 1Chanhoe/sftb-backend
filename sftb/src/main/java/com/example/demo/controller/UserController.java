@@ -38,6 +38,7 @@ public class UserController {
         }
         
 
+
         // JSESSIONID 쿠키 삭제
         Cookie cookie = new Cookie("JSESSIONID", null);
         cookie.setPath("/"); // 쿠키 경로 설정
@@ -54,6 +55,7 @@ public class UserController {
   
     @PostMapping("/SignUp")
     public ResponseEntity<?> registerUser(@RequestBody User user) {
+
         try {
             userService.signUp(user);
             return ResponseEntity.ok("User registered successfully");
@@ -63,6 +65,7 @@ public class UserController {
             errorResponse.put("message", e.getMessage());
             return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
         }
+
     }
 
 

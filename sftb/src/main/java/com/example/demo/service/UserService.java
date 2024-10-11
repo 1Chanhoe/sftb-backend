@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -23,6 +24,7 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
 
     
     // 회원가입 메서드 (ID, 학번, 이메일 중복 확인 로직 MyBatis 사용)
@@ -64,6 +66,7 @@ public class UserService {
         userMapper.insertUser(user);
         logger.info("User signed up successfully with userID: {}", user.getUserID());
     }
+
 
     // 로그인 메서드, 사용자 ID 찾기, 비밀번호 찾기 및 비밀번호 변경 메서드는 기존과 동일합니다.
 
@@ -125,6 +128,7 @@ public class UserService {
             return true;
         }
         logger.warn("Failed to reset password for userID: {}", userID);
+
         return false;
     }
 }

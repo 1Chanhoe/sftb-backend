@@ -7,14 +7,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.demo.dto.PostRequest;
+import com.example.demo.dto.PostDto;
 import java.util.List;
+
 import java.util.Map; // Map 클래스 import 추가
 import java.util.HashMap;  // 추가된 부분
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/posts")
 public class PostController {
+	
+	 private static final Logger logger = LoggerFactory.getLogger(PostController.class); // Logger 초기화
 
     @Autowired
     private PostService postService;
@@ -47,6 +55,7 @@ public class PostController {
 
         return ResponseEntity.ok(posts);
     }
+
  // 게시물 하트 수 증가/감소
     @PostMapping("/{postId}/hearts")
     public ResponseEntity<?> updateHeartCount(@PathVariable("postId") Long postId, @RequestBody Map<String, Boolean> requestBody) {
@@ -70,4 +79,25 @@ public class PostController {
         response.put("heartCount", heartCount);
         return ResponseEntity.ok(response);
     }
+
+    
+    // 게시글 수정 API
+    @PutMapping("/{postId}")
+    public ResponseEntity<String> updatePost(
+        @PathVariable("postId") Long postId,
+        @RequestBody PostDto postDto
+    ) {
+        logger.info("Received update request for postId: {} with title: {} and content: {}", postId, postDto.getTitle(), postDto.getContent());
+        boolean isUpdated = postService.updatePost(postId, postDto);
+        if (isUpdated) {
+            return ResponseEntity.ok("Post updated successfully");
+        } else {
+            return ResponseEntity.status(404).body("Post not found");
+        }
+    }
+
+    
+
+   
+
 }

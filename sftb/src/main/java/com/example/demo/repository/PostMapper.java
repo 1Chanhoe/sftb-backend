@@ -2,7 +2,6 @@ package com.example.demo.repository;
 
 import org.apache.ibatis.annotations.*;
 import com.example.demo.entity.Post;
-
 import java.util.List;
 
 @Mapper
@@ -29,6 +28,14 @@ public interface PostMapper {
     })
     List<Post> findAllPosts();
 
+    // 게시물 수정
+    @Update("UPDATE post SET Title = #{title}, content = #{content}, Update_At = NOW() WHERE Post_ID = #{postId}")
+    void updatePost(@Param("postId") Long postId, @Param("title") String title, @Param("content") String content);
+
+    // 게시물 조회
+    @Select("SELECT * FROM post WHERE Post_ID = #{postId}")
+    Post findPostById(@Param("postId") Long postId);
+
     // 특정 Board_ID에 따른 게시물 조회
     @Select("SELECT * FROM post WHERE Board_ID = #{boardId} ORDER BY Create_At DESC")
     @Results({
@@ -51,8 +58,8 @@ public interface PostMapper {
     // 하트 수 감소
     @Update("UPDATE post SET Heart = Heart - 1 WHERE Post_ID = #{postId}")
     void decrementHeartCount(Long postId); // 하트 수 감소 메서드 추가
-    
-    //하트 갯수 가져오기
+
+    // 하트 갯수 가져오기
     @Select("SELECT Heart FROM post WHERE Post_ID = #{postId}")
     int findHeartCountByPostId(Long postId);
 }

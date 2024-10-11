@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.example.demo.entity.Post;
 import com.example.demo.repository.PostMapper;
+import com.example.demo.dto.PostDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +32,7 @@ public class PostService {
         return posts;
     }
 
+
     // 특정 Board_ID에 따른 게시물 가져오기
     public List<Post> getPostsByBoardId(int boardId) {
         logger.info("Fetching posts for Board_ID: {}", boardId);
@@ -52,4 +54,27 @@ public class PostService {
     public int getHeartCount(Long postId) {
         return postMapper.findHeartCountByPostId(postId);
     }
+
+
+    // 게시물 수정
+    public boolean updatePost(Long postId, PostDto postDto) {
+        logger.info("Updating post with ID: {}", postId);
+
+        // 해당 ID의 게시글을 찾음
+        Post existingPost = postMapper.findPostById(postId);
+        if (existingPost == null) {
+            throw new IllegalArgumentException("게시물이 존재하지 않습니다.");
+        }
+
+        // PostDto에서 받은 데이터를 Post 엔티티에 직접 업데이트
+        existingPost.setTitle(postDto.getTitle());
+        existingPost.setContent(postDto.getContent());
+
+        // 수정된 게시글을 DB에 저장
+        postMapper.updatePost(postId, postDto.getTitle(), postDto.getContent());
+
+        return true; // 성공 시 true 반환
+    }
+
 }
+
