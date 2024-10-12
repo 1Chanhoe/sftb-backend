@@ -23,6 +23,9 @@ public class Post {
 
     @Column(name = "ViewCount") // 조회수 필드 (초기값 0)
     private int viewCount = 0; // 조회수
+    
+    @Column(name = "Heart")
+    private int heart = 0; // 좋아요 수 기본값
 
     @Column(name = "Create_At", nullable = false) // 작성 시간 필드
     private LocalDateTime createAt; // 작성 시간
@@ -76,6 +79,13 @@ public class Post {
 
     public void setViewCount(int viewCount) {
         this.viewCount = viewCount;
+    }
+    public int getHeart() {
+        return heart;
+    }
+
+    public void setHeart(int heart) {
+        this.heart = heart;
     }
 
     // Getter and Setter for createAt

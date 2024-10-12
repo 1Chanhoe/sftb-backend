@@ -33,6 +33,30 @@ public class PostService {
         return posts;
     }
 
+
+    // 특정 Board_ID에 따른 게시물 가져오기
+    public List<Post> getPostsByBoardId(int boardId) {
+        logger.info("Fetching posts for Board_ID: {}", boardId);
+        List<Post> posts = postMapper.findPostsByBoardId(boardId); // 특정 Board_ID에 따른 게시물 가져오기
+        logger.info("Fetched {} posts for Board_ID: {}", posts.size(), boardId); // 현재 가져온 게시물의 수
+        return posts;
+    }
+
+    // 하트 수 증가
+    public void incrementHeartCount(Long postId) {
+        logger.info("Incrementing heart count for Post_ID: {}", postId);
+        postMapper.incrementHeartCount(postId); // 하트 수를 증가시키는 메서드 호출
+        logger.info("Heart count incremented for Post_ID: {}", postId);
+    }
+    public void decrementHeartCount(Long postId) {
+        postMapper.decrementHeartCount(postId); // 하트 수 감소 로직 추가
+    }
+    //하트 갯수 가져오기
+    public int getHeartCount(Long postId) {
+        return postMapper.findHeartCountByPostId(postId);
+    }
+
+
     // 게시물 수정
     public boolean updatePost(Long postId, PostDto postDto) {
         logger.info("Updating post with ID: {}", postId);
@@ -84,3 +108,4 @@ public class PostService {
 
 
 }
+

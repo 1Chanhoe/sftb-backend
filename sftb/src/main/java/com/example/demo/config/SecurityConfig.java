@@ -39,6 +39,7 @@ public class SecurityConfig {
                 authorizeRequests
                     .requestMatchers("/", "/SignUp", "/SearchIdPage", "/SearchPwPage").permitAll()
                     .requestMatchers("/api/auth/**").permitAll()
+
                     .requestMatchers("/api/posts").permitAll()
                     .requestMatchers("/api/posts/**").permitAll()
                     .requestMatchers("/api/comments").permitAll()
@@ -46,6 +47,7 @@ public class SecurityConfig {
                     .requestMatchers("/api/comments/replies").permitAll()
                     .requestMatchers("/api/comments/replies/**").permitAll()
                     
+
                     .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
