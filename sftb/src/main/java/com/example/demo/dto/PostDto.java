@@ -1,9 +1,12 @@
 package com.example.demo.dto;
 
+import java.time.LocalDateTime; // LocalDateTime을 사용하기 위해 추가
+
 public class PostDto {
     private String title;
     private String content;
     private Long postId;
+    private LocalDateTime updateAt; // 수정된 시간 추가
 
     // Getters and Setters
     public String getTitle() {
@@ -30,5 +33,11 @@ public class PostDto {
         this.postId = postId;
     }
     
-    
+    public LocalDateTime getUpdateAt() { 
+        return updateAt;
+    }
+
+    public void setUpdateAt(LocalDateTime updateAt) { 
+        this.updateAt = updateAt;
+    }
 }

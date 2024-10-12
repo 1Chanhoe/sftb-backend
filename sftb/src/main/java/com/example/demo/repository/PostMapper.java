@@ -2,7 +2,7 @@ package com.example.demo.repository;
 
 import org.apache.ibatis.annotations.*;
 import com.example.demo.entity.Post;
-
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -29,13 +29,19 @@ public interface PostMapper {
     List<Post> findAllPosts();
    
  // 게시물 수정
-    @Update("UPDATE post SET Title = #{title}, content = #{content}, Update_At = NOW() WHERE Post_ID = #{postId}")
-    void updatePost(@Param("postId") Long postId, @Param("title") String title, @Param("content") String content);
-
+    @Update("UPDATE post SET Title = #{title}, Content = #{content}, Update_At = #{updateAt} WHERE Post_ID = #{postId}")
+    void updatePost(@Param("postId") Long postId, @Param("title") String title, @Param("content") String content, @Param("updateAt") LocalDateTime updateAt);
 
     // 게시물 조회
     @Select("SELECT * FROM post WHERE Post_ID = #{postId}")
     Post findPostById(@Param("postId") Long postId);
+    
+    
+    
+ // 게시물 삭제
+    @Delete("DELETE FROM post WHERE Post_ID = #{postId}")
+    void deletePost(@Param("postId") Long postId);
+
     
  
 

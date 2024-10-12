@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 @RequestMapping("/api/posts")
 public class PostController {
 	
-	 private static final Logger logger = LoggerFactory.getLogger(PostController.class); // Logger 초기화
+    private static final Logger logger = LoggerFactory.getLogger(PostController.class); // Logger 초기화
 
     @Autowired
     private PostService postService;
@@ -45,20 +45,40 @@ public class PostController {
     
     // 게시글 수정 API
     @PutMapping("/{postId}")
-    public ResponseEntity<String> updatePost(
+    public ResponseEntity<PostDto> updatePost(
         @PathVariable("postId") Long postId,
         @RequestBody PostDto postDto
     ) {
         logger.info("Received update request for postId: {} with title: {} and content: {}", postId, postDto.getTitle(), postDto.getContent());
+        
         boolean isUpdated = postService.updatePost(postId, postDto);
+        
         if (isUpdated) {
-            return ResponseEntity.ok("Post updated successfully");
-        } else {
-            return ResponseEntity.status(404).body("Post not found");
+            // 수정된 게시글을 다시 조회하여 최신 데이터를 클라이언트에 반환
+            Post updatedPost = postService.getPostById(postId);
+            PostDto updatedPostDto = new PostDto();
+            updatedPostDto.setTitle(updatedPost.getTitle());
+            updatedPostDto.setContent(updatedPost.getContent());
+            updatedPostDto.setPostId(updatedPost.getPostId());
+            updatedPostDto.setUpdateAt(updatedPost.getUpdateAt());
+
+            return ResponseEntity.ok(updatedPostDto); // 수정된 게시글 정보 반환
+        } else {	
+            return ResponseEntity.status(404).body(null); // Post not found
         }
     }
 
-    
-
-   
+    // 게시물 삭제
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<?> deletePost(@PathVariable("postId") Long postId) {
+        logger.info("Received delete request for postId: {}", postId);
+        
+        boolean isDeleted = postService.deletePost(postId);
+        
+        if (isDeleted) {
+            return ResponseEntity.ok("게시물이 삭제되었습니다."); // 삭제 성공 메시지 반환
+        } else {
+            return ResponseEntity.status(404).body("게시물을 찾을 수 없습니다."); // 삭제 실패 메시지
+        }
+    }
 }
