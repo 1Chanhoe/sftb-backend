@@ -35,4 +35,27 @@ public class CommentService {
         }
         commentMapper.insertComment(comment);
     }
+    
+    // 댓글 수정 메소드
+    public Comment updateComment(Long commentId, String content) {
+        commentMapper.updateComment(commentId, content);
+        // 수정된 댓글을 가져오기 위해 댓글 ID를 사용하여 다시 조회
+        return commentMapper.findCommentById(commentId);
+    }
+
+    // 댓글 삭제 메소드
+    public void deleteComment(Long commentId) {
+        commentMapper.deleteComment(commentId);
+    }
+    
+    // 대댓글 수정 메소드
+    public Comment updateReply(Long replyId, String content) {
+        commentMapper.updateComment(replyId, content);
+        return commentMapper.findCommentById(replyId); // 수정된 대댓글을 반환
+    }
+
+    // 대댓글 삭제 메소드
+    public void deleteReply(Long replyId) {
+        commentMapper.deleteComment(replyId);
+    }
 }

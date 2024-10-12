@@ -3,8 +3,6 @@ package com.example.demo.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Data;
-
-
 import lombok.Getter;
 import lombok.Setter;
 @Data
@@ -21,7 +19,7 @@ public class Comment {
     private Byte adopt;         // 채택 여부 (Adopt)
     private Integer heart;      // 좋아요 수 (Heart)
     private Long postId;        // 게시글 ID (Post_ID)
-
+    private String userId;
     private List<Comment> replies; // 대댓글 목록
     
     // Getters and Setters
@@ -55,6 +53,14 @@ public class Comment {
 
     public void setMemberId(String memberId) {
         this.memberId = memberId;
+    }
+    
+    public String getUserId() { // userId에 대한 getter 추가
+        return userId;
+    }
+
+    public void setUserId(String userId) { // userId에 대한 setter 추가
+        this.userId = userId;
     }
 
     public LocalDateTime getCreatedAt() {

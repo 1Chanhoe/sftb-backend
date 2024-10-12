@@ -43,6 +43,8 @@ public class SecurityConfig {
                     .requestMatchers("/api/posts/**").permitAll()
                     .requestMatchers("/api/comments").permitAll()
                     .requestMatchers("/api/comments/**").permitAll()
+                    .requestMatchers("/api/comments/replies").permitAll()
+                    .requestMatchers("/api/comments/replies/**").permitAll()
                     
                     .anyRequest().authenticated()
             )
