@@ -1,40 +1,86 @@
 package com.example.demo.service;
 
-import org.springframework.beans.factory.annotation.Autowired; //Spring Autowired 어노테이션
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder; //Spring Security 패스워드 인코더
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import com.example.demo.entity.User;
 import com.example.demo.repository.UserMapper;
+import org.apache.coyote.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Service
 public class UserService {
-   private static final Logger logger = LoggerFactory.getLogger(UserService.class); // Logger 객체 생성
-    @Autowired //의존성 주입
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
+    @Autowired
     private UserMapper userMapper;
 
-    @Autowired //의존성 주입
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public void saveUser(User user) { //User객체를 데베에 저장
-       
-        user.setPassword(passwordEncoder.encode(user.getPassword())); //비번 암호화
-        userMapper.insertUser(user); //데베에 사용자 삽입
-    }
-    // 로그인 메서드
-    public User loginUser(String userID, String password) {
-        // 아이디로 사용자 조회
-       logger.info("Attempting to log in with userID: {} and password: {}", userID, password);
-        User user = userMapper.findByUserId(userID);
+
+    
+    // 회원가입 메서드 (ID, 학번, 이메일 중복 확인 로직 MyBatis 사용)
+    @Transactional
+    public void signUp(User user) throws BadRequestException {
+        StringBuilder errorMessage = new StringBuilder();
+
+        boolean hasError = false;
+
+
+        // 학번 중복 확인
+        if (userMapper.existsByStudentID(user.getStudentID())) {
+            errorMessage.append("Student ID already exists. ");
+            hasError = true;
+        }
         
-        // 사용자 정보가 존재하고 비밀번호가 일치하는지 확인
+        // ID 중복 확인
+        if (userMapper.existsByUserID(user.getUserID())) {
+            errorMessage.append("User ID already exists. ");
+            hasError = true;
+        }
+
+        // 이메일 중복 확인
+        if (userMapper.existsByEmail(user.getEmail())) {
+            errorMessage.append("Email already exists. ");
+            hasError = true;
+        }
+
+        // 오류가 있는 경우 예외 발생
+        if (hasError) {
+            logger.warn("Failed to register user: {}", errorMessage.toString().trim());
+            throw new BadRequestException(errorMessage.toString().trim());
+        }
+
+        // 비밀번호 암호화
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        // MyBatis를 사용하여 사용자 저장
+        userMapper.insertUser(user);
+        logger.info("User signed up successfully with userID: {}", user.getUserID());
+    }
+
+
+    // 로그인 메서드, 사용자 ID 찾기, 비밀번호 찾기 및 비밀번호 변경 메서드는 기존과 동일합니다.
+
+
+    // 로그인 메서드 (MyBatis 사용)
+    public User loginUser(String userID, String password) {
+        logger.info("Attempting to log in with userID: {}", userID);
+        User user = userMapper.findByUserId(userID);
+
         if (user != null) {
             logger.info("User found: {}", user.getUserID());
             if (passwordEncoder.matches(password, user.getPassword())) {
                 logger.info("Password match for userID: {}", userID);
-                return user; // 로그인 성공, 사용자 정보를 반환
+                return user;
             } else {
                 logger.warn("Password mismatch for userID: {}", userID);
             }
@@ -42,9 +88,10 @@ public class UserService {
             logger.warn("No user found with userID: {}", userID);
         }
 
-        return null; // 로그인 실패, null 반환
+        return null;
     }
-    
+
+    // 사용자 ID 찾기 메서드 (MyBatis 사용)
     public String findUserId(String userName, String email) {
         logger.info("Attempting to find user ID for userName: {}, email: {}", userName, email);
         User user = userMapper.findByNameAndEmail(userName, email);
@@ -52,11 +99,12 @@ public class UserService {
             logger.info("Found user: {}", user.getUserID());
             return user.getUserID();
         } else {
-            logger.warn("Failed to find user ID for name: {}, email: {}", userName, email);
+            logger.warn("Failed to find user ID for userName: {}, email: {}", userName, email);
             return null;
         }
     }
-    
+
+    // 비밀번호 찾기 메서드 (MyBatis 사용)
     public String findPassword(String userName, String email, String userId) {
         logger.info("Attempting to find password for userName: {}, email: {}, userId: {}", userName, email, userId);
 
@@ -65,19 +113,23 @@ public class UserService {
             logger.info("Found password: {}", user.getPassword());
             return user.getPassword();
         } else {
-            logger.warn("Failed to find password for name: {}, email: {}, userId: {}", userName, email, userId);
+            logger.warn("Failed to find password for userName: {}, email: {}, userId: {}", userName, email, userId);
             return null;
         }
     }
-    
- // 비밀번호 변경 메서드
+
+    // 비밀번호 변경 메서드 (MyBatis 사용)
     public boolean resetPassword(String userID, String newPassword) {
         User user = userMapper.findByUserId(userID);
         if (user != null) {
             user.setPassword(passwordEncoder.encode(newPassword));
-            userMapper.updateUser(user); // 비밀번호 업데이트 메서드 호출
+            userMapper.updateUser(user);
+            logger.info("Password reset successful for userID: {}", userID);
             return true;
         }
+        logger.warn("Failed to reset password for userID: {}", userID);
+
         return false;
     }
 }
+
