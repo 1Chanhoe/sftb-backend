@@ -39,7 +39,6 @@ public class SecurityConfig {
                 authorizeRequests
                     .requestMatchers("/", "/SignUp", "/SearchIdPage", "/SearchPwPage").permitAll()
                     .requestMatchers("/api/auth/**").permitAll()
-
                     .requestMatchers("/api/posts").permitAll()
                     .requestMatchers("/api/posts/**").permitAll()
                     .requestMatchers("/api/comments").permitAll()

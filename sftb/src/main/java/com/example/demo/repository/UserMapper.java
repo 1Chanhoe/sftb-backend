@@ -41,5 +41,9 @@ public interface UserMapper {
     // 이메일로 중복 체크
     @Select("SELECT COUNT(*) > 0 FROM customers WHERE Email = #{email}")
     boolean existsByEmail(@Param("email") String email);
+    
+    //티어경험치 추가
+    @Update("UPDATE customers SET Tier_Experience = COALESCE(Tier_Experience, 0) + #{experience} WHERE UserID = #{userID}")
+    void updateUserExperience(@Param("userID") String userID, @Param("experience") int experience);
 }
 
