@@ -139,5 +139,11 @@ public class UserService {
         userMapper.updateUserExperience(userID, experience);
         logger.info("Tier experience added successfully for userID: {}", userID);
     }
+    
+    // 유저 레벨 경험치 추가 메서드
+    @Transactional
+    public void updateUserLevelExperience(String userId, int experience) {
+        userMapper.updateUserLevelExperience(userId, experience);
+    }
 }
 

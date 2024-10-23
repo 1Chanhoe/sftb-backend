@@ -42,8 +42,11 @@ public interface UserMapper {
     @Select("SELECT COUNT(*) > 0 FROM customers WHERE Email = #{email}")
     boolean existsByEmail(@Param("email") String email);
     
-    //티어경험치 추가
+    //티어경험치 추가 COALESCE()는 NULL인경우 0을반환, 아닐경우 그값을 그대로 반영함 나중에 레벨,티어 업데이트할때도 사용해야할거같음
     @Update("UPDATE customers SET Tier_Experience = COALESCE(Tier_Experience, 0) + #{experience} WHERE UserID = #{userID}")
     void updateUserExperience(@Param("userID") String userID, @Param("experience") int experience);
+    // 경험치 업데이트
+    @Update("UPDATE customers SET UserLevel_Experience = COALESCE(UserLevel_Experience, 0) + #{experience} WHERE UserID = #{userId}")
+    void updateUserLevelExperience(@Param("userId") String userId, @Param("experience") int experience);
 }
 

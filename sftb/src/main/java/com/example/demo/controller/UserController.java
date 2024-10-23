@@ -16,7 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-
+import com.example.demo.dto.UserExperienceUpdateRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,20 +36,13 @@ public class UserController {
         if (session != null) {
             session.invalidate();
         }
-        
-
-
         // JSESSIONID 쿠키 삭제
         Cookie cookie = new Cookie("JSESSIONID", null);
         cookie.setPath("/"); // 쿠키 경로 설정
         cookie.setHttpOnly(true); // 보안 설정
         cookie.setMaxAge(0); // 쿠키 만료 시간 0으로 설정 (즉시 삭제)
         response.addCookie(cookie);
-
         return ResponseEntity.ok("Logged out successfully");
-
-
-
     }
 
   
@@ -136,6 +129,12 @@ public class UserController {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("message", ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+    
+    @PutMapping("/experience")
+    public ResponseEntity<User> updateExperience(@RequestBody UserExperienceUpdateRequest userLevelExperience) {
+        userService.updateUserLevelExperience(userLevelExperience.getUserId(), userLevelExperience.getUserLevelExperience());
+        return ResponseEntity.ok().build();
     }
 }
 
