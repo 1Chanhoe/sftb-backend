@@ -26,4 +26,32 @@ public class CommentController {
         commentService.addComment(commentRequest.toComment()); // DTO를 Comment로 변환
         return ResponseEntity.ok().build();
     }
+    
+    //댓글 수정 API
+    @PutMapping("/{commentId}")
+    public ResponseEntity<Comment> updateComment(@PathVariable("commentId") Long commentId, @RequestBody CommentRequest commentRequest) {
+        Comment updatedComment = commentService.updateComment(commentId, commentRequest.getContent());
+        return ResponseEntity.ok(updatedComment); // 수정된 댓글 객체 반환
+    }
+    
+    // 댓글 삭제 API
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<Void> deleteComment(@PathVariable("commentId") Long commentId) {
+        commentService.deleteComment(commentId);
+        return ResponseEntity.ok().build();
+    }
+    
+    // 대댓글 수정 API
+    @PutMapping("/replies/{replyId}")
+    public ResponseEntity<Comment> updateReply(@PathVariable("replyId") Long replyId, @RequestBody CommentRequest commentRequest) {
+        Comment updatedReply = commentService.updateReply(replyId, commentRequest.getContent());
+        return ResponseEntity.ok(updatedReply); // 수정된 대댓글을 반환
+    }
+
+    // 대댓글 삭제 API
+    @DeleteMapping("/replies/{replyId}")
+    public ResponseEntity<Void> deleteReply(@PathVariable("replyId") Long replyId) {
+        commentService.deleteComment(replyId);
+        return ResponseEntity.ok().build();
+    }
 }

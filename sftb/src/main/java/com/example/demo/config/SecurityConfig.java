@@ -40,12 +40,16 @@ public class SecurityConfig {
                 authorizeRequests
                     .requestMatchers("/", "/SignUp", "/SearchIdPage", "/SearchPwPage").permitAll()
                     .requestMatchers("/api/auth/**").permitAll()
+
                     .requestMatchers("/api/posts").permitAll()
                     .requestMatchers("/api/posts/**").permitAll()
-
                     .requestMatchers("/api/comments").permitAll()
                     .requestMatchers("/api/comments/**").permitAll()
-                    //.requestMatchers(HttpMethod.PUT, "/api/auth/users/**/newmember").authenticated() // 인증된 사용자만 접근 허용
+                    .requestMatchers("/api/comments/replies").permitAll()
+                    .requestMatchers("/api/comments/replies/**").permitAll()
+                    
+
+
                     .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
