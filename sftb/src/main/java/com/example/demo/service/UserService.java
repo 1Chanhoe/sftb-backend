@@ -124,6 +124,7 @@ public class UserService {
     // 신규 회원 상태 업데이트 메서드
     public void updateNewMemberStatus(String userID, boolean newMember) {
         int newMemberValue = newMember ? 1 : 0; // boolean 값을 int로 변환
+        logger.info("Attempting to update new member status to {} for userID: {}", newMemberValue, userID);
         userMapper.updateNewMember(userID, newMemberValue); // newMember 상태 업데이트
         logger.info("New member status updated for userID: {}", userID);
     }
