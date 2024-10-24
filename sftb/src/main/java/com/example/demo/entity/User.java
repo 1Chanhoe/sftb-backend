@@ -13,7 +13,6 @@ public class User {
     private String password;    // 비밀번호
     private String userName;    // 이름
     private String email;       // 이메일
-
     private boolean newMember;
     private int experiencePoints; // 경험치 필드 추가
 
