@@ -70,7 +70,7 @@ public class User {
         return experiencePoints;
     }
 
-    // 경험치 setter
+    // 경험치 setter 
     public void setExperiencePoints(int experiencePoints) {
         this.experiencePoints = experiencePoints;
     }
