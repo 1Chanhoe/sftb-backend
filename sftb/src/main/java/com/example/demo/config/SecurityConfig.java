@@ -3,6 +3,7 @@ package com.example.demo.config;
 import org.springframework.context.annotation.Bean;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -40,6 +41,11 @@ public class SecurityConfig {
                     .requestMatchers("/", "/SignUp", "/SearchIdPage", "/SearchPwPage").permitAll()
                     .requestMatchers("/api/auth/**").permitAll()
                     .requestMatchers("/api/posts").permitAll()
+                    .requestMatchers("/api/posts/**").permitAll()
+
+                    .requestMatchers("/api/comments").permitAll()
+                    .requestMatchers("/api/comments/**").permitAll()
+                    //.requestMatchers(HttpMethod.PUT, "/api/auth/users/**/newmember").authenticated() // 인증된 사용자만 접근 허용
                     .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
@@ -50,6 +56,7 @@ public class SecurityConfig {
         return http.build();
     }
 
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -57,8 +64,6 @@ public class SecurityConfig {
     
 
 
-
-    
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {

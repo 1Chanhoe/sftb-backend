@@ -14,7 +14,8 @@ public class User {
     private String userName;    // 이름
     private String email;       // 이메일
 
-    private int experiencePoints; // 기본값은 0으로 설정됨, 경허미 핊드 추가
+    private boolean newMember;
+    private int experiencePoints; // 경험치 필드 추가
 
 
     public String getUserID() {
@@ -56,5 +57,24 @@ public class User {
     public void setUserName(String userName) {
         this.userName = userName;
     }
+    
+    public boolean getNewMember() { // Getter 메서드 추가
+        return newMember;
+    }
+
+    public void setNewMember(boolean newMember) { // Setter 메서드 추가
+        this.newMember = newMember;
+    }
+    
+    // 경험치 getter
+    public int getExperiencePoints() {
+        return experiencePoints;
+    }
+
+    // 경험치 setter
+    public void setExperiencePoints(int experiencePoints) {
+        this.experiencePoints = experiencePoints;
+    }
 
 }
+
