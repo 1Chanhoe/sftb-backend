@@ -121,6 +121,23 @@ public class UserService {
         return false;
     }
 
+    
+    // 유저 티어 경험치 추가 메서드
+    @Transactional
+    public void addTierExperience(String userID, int experience) {
+        logger.info("Adding {} tier experience to userID: {}", experience, userID);
+        userMapper.updateUserExperience(userID, experience);
+        logger.info("Tier experience added successfully for userID: {}", userID);
+    }
+    
+    // 유저 레벨 경험치 추가 메서드
+    @Transactional
+    public void updateUserLevelExperience(String userId, int experience) {
+        userMapper.updateUserLevelExperience(userId, experience);
+    }
+
+
+
     // 신규 회원 상태 업데이트 메서드
     public void updateNewMemberStatus(String userID, boolean newMember) {
         int newMemberValue = newMember ? 1 : 0; // boolean 값을 int로 변환

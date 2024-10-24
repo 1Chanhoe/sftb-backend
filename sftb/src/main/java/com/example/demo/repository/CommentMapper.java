@@ -37,4 +37,11 @@ public interface CommentMapper {
     // 댓글 삭제 쿼리
     @Delete("DELETE FROM comments WHERE Comment_ID = #{commentId}")
     void deleteComment(@Param("commentId") Long commentId);
+    
+    @Delete("DELETE FROM comments WHERE Parent_Seq = #{commentId}")
+    void deleteRepliesByParentId(@Param("commentId") Long commentId);
+    
+    //채택시 Adopt True로 변환
+    @Update("UPDATE comments SET Adopt = true WHERE Comment_ID = #{commentId}")
+    void updateAdoptStatus(@Param("commentId") Long commentId);
 }
