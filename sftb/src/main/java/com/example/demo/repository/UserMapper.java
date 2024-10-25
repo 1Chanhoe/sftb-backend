@@ -10,7 +10,7 @@ import com.example.demo.entity.User;
 @Mapper
 public interface UserMapper {
     // 사용자 삽입
-    @Insert("INSERT INTO customers (UserID, StudentID, Password, UserName, Email, NewMember, ExperiencePoints) VALUES (#{userID}, #{studentID}, #{password}, #{userName}, #{email}, #{newMember}, #{experiencePoints})")
+    @Insert("INSERT INTO customers (UserID, StudentID, Password, UserName, Email, NewMember,  UserLevel_Experience) VALUES (#{userID}, #{studentID}, #{password}, #{userName}, #{email}, #{newMember}, #{userLevelExperience})")
     void insertUser(User user);
 
     // UserID로 사용자 검색
@@ -50,8 +50,8 @@ public interface UserMapper {
     void updateUserExperience(@Param("userID") String userID, @Param("experience") int experience);
     
     // 경험치 업데이트
-    @Update("UPDATE customers SET UserLevel_Experience = COALESCE(UserLevel_Experience, 0) + #{experience} WHERE UserID = #{userId}")
-    void updateUserLevelExperience(@Param("userId") String userId, @Param("experience") int experience);
+    @Update("UPDATE customers SET UserLevel_Experience = COALESCE(UserLevel_Experience, 0) + #{userLevelExperience} WHERE UserID = #{userId}")
+    void updateUserLevelExperience(@Param("userId") String userId, @Param("userLevelExperience") int userLevelExperience);
 
     // 유저 레벨 증가
     @Update("UPDATE customers SET UserLevel = COALESCE(UserLevel, 0) + 1 WHERE UserID = #{userId}")
@@ -65,10 +65,4 @@ public interface UserMapper {
     @Select("SELECT COALESCE(UserLevel_Experience, 0) FROM customers WHERE UserID = #{userId}")
     int getUserLevelExperience(String userId);
 
-    // 경험치 업데이트
-    @Update("UPDATE customers SET ExperiencePoints = #{experiencePoints} WHERE UserID = #{userID}")
-    void updateExperiencePoints(@Param("userID") String userID, @Param("experiencePoints") int experiencePoints);
-    
-    @Select("SELECT ExperiencePoints FROM customers WHERE UserID = #{userID}")
-    int findExperiencePointsByUserId(@Param("userID") String userID);
 }

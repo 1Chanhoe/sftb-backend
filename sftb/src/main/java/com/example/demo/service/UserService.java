@@ -134,6 +134,7 @@ public class UserService {
         logger.info("Tier experience added successfully for userID: {}", userID);
     }
     
+
     // 유저 레벨 경험치 추가 메서드
     @Transactional
     public void updateUserLevelExperience(String userId, int experience) {
@@ -158,51 +159,19 @@ public class UserService {
         userMapper.updateNewMember(userID, newMemberValue); // newMember 상태 업데이트
         logger.info("New member status updated for userID: {}", userID);
     }
-
-    // 사용자 ID로 유저 찾기
-    public User findById(String userID) {
-        if (userID == null) {
-            throw new RuntimeException("User ID cannot be null");
-        }
-
-        User user = userMapper.findByUserId(userID);
-        
-        if (user == null) {
-            throw new RuntimeException("User not found for ID: " + userID);
-        }
-        
-        return user; // 사용자가 존재하면 반환
-    }
-
-    // 사용자 정보 업데이트 메서드
-    public void updateUser(User user) {
-        userMapper.updateUser(user); // 사용자 정보를 저장하여 업데이트
-    }
     
     // 사용자 경험치 가져오기 메서드
-    public int getExperiencePoints(String userID) {
+    public int getUserLevelExperience(String userID) {
+
         User user = userMapper.findByUserId(userID);
         if (user != null) {
-            return user.getExperiencePoints();
+            return user.getUserLevelExperience();
         } else {
             logger.warn("User not found for userID: {}", userID);
             throw new RuntimeException("User not found");
         }
     }
     
-    // 경험치 업데이트 메서드
-    public void updateExperiencePoints(String userID, int experiencePoints) {
-        User user = userMapper.findByUserId(userID);
-        if (user != null) {
-            int currentExperiencePoints = user.getExperiencePoints();
-            int newExperiencePoints = currentExperiencePoints + experiencePoints; // 기존 경험치에 추가
-            userMapper.updateExperiencePoints(userID, newExperiencePoints);
-            logger.info("Experience points updated for userID: {}. Previous: {}, Added: {}, New total: {}", userID, currentExperiencePoints, experiencePoints, newExperiencePoints);
-        } else {
-            logger.warn("User not found for userID: {}", userID);
-            throw new RuntimeException("User not found");
-        }
-    }
     
 
 }
