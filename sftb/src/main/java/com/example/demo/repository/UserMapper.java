@@ -53,10 +53,16 @@ public interface UserMapper {
     @Update("UPDATE customers SET UserLevel_Experience = COALESCE(UserLevel_Experience, 0) + #{userLevelExperience} WHERE UserID = #{userId}")
     void updateUserLevelExperience(@Param("userId") String userId, @Param("userLevelExperience") int userLevelExperience);
 
+    // 유저 레벨 증가
+    @Update("UPDATE customers SET UserLevel = COALESCE(UserLevel, 0) + 1 WHERE UserID = #{userId}")
+    void updateUserLevel(@Param("userId") String userId);
 
- 
-    @Select("SELECT UserLevel_Experience FROM customers WHERE UserID = #{userID}")
-    int findUserLevelExperienceByUserId(@Param("userID") String userID);
+    // 현재 티어 경험치 조회
+    @Select("SELECT COALESCE(Tier_Experience, 0) FROM customers WHERE UserID = #{userId}")
+    int getTierExperience(String userId);
 
+    // 현재 유저 레벨 경험치 조회
+    @Select("SELECT COALESCE(UserLevel_Experience, 0) FROM customers WHERE UserID = #{userId}")
+    int getUserLevelExperience(String userId);
 
 }

@@ -19,7 +19,11 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
+    
+    public UserService(UserMapper userMapper) {
+        this.userMapper = userMapper;
+    }
+    
     // 회원가입 메서드 (ID, 학번, 이메일 중복 확인 로직 MyBatis 사용)
     @Transactional
     public void signUp(User user) throws BadRequestException {
@@ -131,6 +135,24 @@ public class UserService {
     }
     
 
+    // 유저 레벨 경험치 추가 메서드
+    @Transactional
+    public void updateUserLevelExperience(String userId, int experience) {
+        // 현재 유저 레벨 경험치 가져오기
+        int currentLevelExperience = userMapper.getUserLevelExperience(userId);
+        
+        // 새로운 유저 레벨 경험치 계산
+        int newLevelExperience = experience;
+
+
+        // 유저 레벨 경험치가 100 이상일 경우 처리
+        if (currentLevelExperience + newLevelExperience >= 100) {
+            newLevelExperience -= 100; // 100을 초과하는 부분만 남기고 초기화
+            userMapper.updateUserLevel(userId); // UserLevel 필드 +1 증가
+        }
+        userMapper.updateUserLevelExperience(userId, newLevelExperience);
+    }
+
 
     // 신규 회원 상태 업데이트 메서드
     public void updateNewMemberStatus(String userID, boolean newMember) {
@@ -139,29 +161,10 @@ public class UserService {
         userMapper.updateNewMember(userID, newMemberValue); // newMember 상태 업데이트
         logger.info("New member status updated for userID: {}", userID);
     }
-
-    // 사용자 ID로 유저 찾기
-    public User findById(String userID) {
-        if (userID == null) {
-            throw new RuntimeException("User ID cannot be null");
-        }
-
-        User user = userMapper.findByUserId(userID);
-        
-        if (user == null) {
-            throw new RuntimeException("User not found for ID: " + userID);
-        }
-        
-        return user; // 사용자가 존재하면 반환
-    }
-
-    // 사용자 정보 업데이트 메서드
-    public void updateUser(User user) {
-        userMapper.updateUser(user); // 사용자 정보를 저장하여 업데이트
-    }
     
- // 사용자 경험치 가져오기 메서드
+    // 사용자 경험치 가져오기 메서드
     public int getUserLevelExperience(String userID) {
+
         User user = userMapper.findByUserId(userID);
         if (user != null) {
             return user.getUserLevelExperience();
@@ -171,18 +174,6 @@ public class UserService {
         }
     }
     
-    // 경험치 업데이트 메서드
-    public void updateUserLevelExperience(String userID, int userLevelExperience) {
-        User user = userMapper.findByUserId(userID);
-        if (user != null) {
-            int currentUserLevelExperience = user.getUserLevelExperience();
-            int newUserLevelExperience = currentUserLevelExperience + userLevelExperience; // 기존 경험치에 추가
-            userMapper.updateUserLevelExperience(userID, newUserLevelExperience);
-            logger.info("Experience points updated for userID: {}. Previous: {}, Added: {}, New total: {}", userID, currentUserLevelExperience, userLevelExperience, newUserLevelExperience);
-        } else {
-            logger.warn("User not found for userID: {}", userID);
-            throw new RuntimeException("User not found");
-        }
-    }
+    
 
 }
