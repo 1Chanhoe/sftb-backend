@@ -66,6 +66,7 @@ public class CommentService {
         commentMapper.deleteComment(replyId);
     }
     
+    //댓글 채택
     public Comment adoptComment(Long commentId, String userId, int tierExperience) {
         // 댓글 조회 (CommentMapper 사용)
         Comment comment = commentMapper.findCommentById(commentId);

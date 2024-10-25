@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.CommentRequest;
 import com.example.demo.dto.ResetPasswordRequest;
 
 import com.example.demo.entity.User;
@@ -188,6 +189,13 @@ public class UserController {
     public ResponseEntity<User> updateExperience(@RequestBody UserExperienceUpdateRequest userLevelExperience) {
         userService.updateUserLevelExperience(userLevelExperience.getUserId(), userLevelExperience.getUserLevelExperience());
         return ResponseEntity.ok().build();
+    }
+    
+    @PutMapping("/tier-experience")
+    public ResponseEntity<String> updateTierExperience(@RequestBody CommentRequest commentRequest) {
+        // CommentRequest에서 사용자 ID와 경험치 업데이트 값을 가져옴
+        userService.addTierExperience(commentRequest.getUserId(), commentRequest.getTierExperience());
+        return ResponseEntity.ok("티어 경험치가 성공적으로 업데이트되었습니다.");
     }
 }
 

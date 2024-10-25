@@ -19,7 +19,11 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
+    
+    public UserService(UserMapper userMapper) {
+        this.userMapper = userMapper;
+    }
+    
     // 회원가입 메서드 (ID, 학번, 이메일 중복 확인 로직 MyBatis 사용)
     @Transactional
     public void signUp(User user) throws BadRequestException {
@@ -133,10 +137,19 @@ public class UserService {
     // 유저 레벨 경험치 추가 메서드
     @Transactional
     public void updateUserLevelExperience(String userId, int experience) {
-        userMapper.updateUserLevelExperience(userId, experience);
+        // 현재 유저 레벨 경험치 가져오기
+        int currentLevelExperience = userMapper.getUserLevelExperience(userId);
+        
+        // 새로운 유저 레벨 경험치 계산
+        int newLevelExperience = experience;
+
+        // 유저 레벨 경험치가 100 이상일 경우 처리
+        if (currentLevelExperience + newLevelExperience >= 100) {
+            newLevelExperience -= 100; // 100을 초과하는 부분만 남기고 초기화
+            userMapper.updateUserLevel(userId); // UserLevel 필드 +1 증가
+        }
+        userMapper.updateUserLevelExperience(userId, newLevelExperience);
     }
-
-
 
     // 신규 회원 상태 업데이트 메서드
     public void updateNewMemberStatus(String userID, boolean newMember) {
@@ -166,7 +179,7 @@ public class UserService {
         userMapper.updateUser(user); // 사용자 정보를 저장하여 업데이트
     }
     
- // 사용자 경험치 가져오기 메서드
+    // 사용자 경험치 가져오기 메서드
     public int getExperiencePoints(String userID) {
         User user = userMapper.findByUserId(userID);
         if (user != null) {
@@ -190,5 +203,6 @@ public class UserService {
             throw new RuntimeException("User not found");
         }
     }
+    
 
 }
