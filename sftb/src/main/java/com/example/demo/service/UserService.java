@@ -132,7 +132,6 @@ public class UserService {
     
 
 
-
     // 신규 회원 상태 업데이트 메서드
     public void updateNewMemberStatus(String userID, boolean newMember) {
         int newMemberValue = newMember ? 1 : 0; // boolean 값을 int로 변환
