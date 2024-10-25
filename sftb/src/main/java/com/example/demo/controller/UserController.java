@@ -142,15 +142,15 @@ public class UserController {
     
     
     @PutMapping("/users/{userID}/experience")
-    public ResponseEntity<?> updateExperiencePoints(
+    public ResponseEntity<?> updateUserLevelExperience(
         @PathVariable("userID") String userID,
         @RequestBody Map<String, Integer> request) {
 
         logger.info("Updating experience points for userID: {}", userID);
         
         try {
-            int experiencePoints = request.get("experiencePoints");
-            userService.updateExperiencePoints(userID, experiencePoints);
+            int userLevelExperience = request.get("userLevelExperience");
+            userService.updateUserLevelExperience(userID, userLevelExperience);
             return ResponseEntity.ok("Experience points updated successfully."); // 성공 메시지 반환
         } catch (Exception e) {
             logger.error("Failed to update experience points for userID: {}", userID, e);
@@ -159,12 +159,12 @@ public class UserController {
     }
     
     @GetMapping("/users/{userID}/experience")
-    public ResponseEntity<?> getExperiencePoints(@PathVariable("userID") String userID) {
+    public ResponseEntity<?> getUserLevelExperience(@PathVariable("userID") String userID) {
         logger.info("Fetching experience points for userID: {}", userID);
         
         try {
-            int experiencePoints = userService.getExperiencePoints(userID);
-            return ResponseEntity.ok(Map.of("experiencePoints", experiencePoints));
+            int experience = userService.getUserLevelExperience(userID);
+            return ResponseEntity.ok(Map.of("userLevelExperience", experience));
         } catch (Exception e) {
             logger.error("Failed to fetch experience points for userID: {}", userID, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

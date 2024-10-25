@@ -130,11 +130,6 @@ public class UserService {
         logger.info("Tier experience added successfully for userID: {}", userID);
     }
     
-    // 유저 레벨 경험치 추가 메서드
-    @Transactional
-    public void updateUserLevelExperience(String userId, int experience) {
-        userMapper.updateUserLevelExperience(userId, experience);
-    }
 
 
 
@@ -167,10 +162,10 @@ public class UserService {
     }
     
  // 사용자 경험치 가져오기 메서드
-    public int getExperiencePoints(String userID) {
+    public int getUserLevelExperience(String userID) {
         User user = userMapper.findByUserId(userID);
         if (user != null) {
-            return user.getExperiencePoints();
+            return user.getUserLevelExperience();
         } else {
             logger.warn("User not found for userID: {}", userID);
             throw new RuntimeException("User not found");
@@ -178,13 +173,13 @@ public class UserService {
     }
     
     // 경험치 업데이트 메서드
-    public void updateExperiencePoints(String userID, int experiencePoints) {
+    public void updateUserLevelExperience(String userID, int userLevelExperience) {
         User user = userMapper.findByUserId(userID);
         if (user != null) {
-            int currentExperiencePoints = user.getExperiencePoints();
-            int newExperiencePoints = currentExperiencePoints + experiencePoints; // 기존 경험치에 추가
-            userMapper.updateExperiencePoints(userID, newExperiencePoints);
-            logger.info("Experience points updated for userID: {}. Previous: {}, Added: {}, New total: {}", userID, currentExperiencePoints, experiencePoints, newExperiencePoints);
+            int currentUserLevelExperience = user.getUserLevelExperience();
+            int newUserLevelExperience = currentUserLevelExperience + userLevelExperience; // 기존 경험치에 추가
+            userMapper.updateUserLevelExperience(userID, newUserLevelExperience);
+            logger.info("Experience points updated for userID: {}. Previous: {}, Added: {}, New total: {}", userID, currentUserLevelExperience, userLevelExperience, newUserLevelExperience);
         } else {
             logger.warn("User not found for userID: {}", userID);
             throw new RuntimeException("User not found");

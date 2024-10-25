@@ -20,7 +20,7 @@ public class User {
     private int userLevelExperience; // User Level 경험치
     private int token; // 성과금
     private boolean newMember;
-    private int experiencePoints; // 경험치 필드 추가
+   
     
  
 
@@ -113,14 +113,6 @@ public class User {
         this.newMember = newMember;
     }
     
-    // 경험치 getter
-    public int getExperiencePoints() {
-        return experiencePoints;
-    }
-
-    // 경험치 setter 
-    public void setExperiencePoints(int experiencePoints) {
-        this.experiencePoints = experiencePoints;
-    }
+ 
 
 }
