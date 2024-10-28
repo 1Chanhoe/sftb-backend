@@ -129,9 +129,39 @@ public class UserService {
     // 유저 티어 경험치 추가 메서드
     @Transactional
     public void addTierExperience(String userID, int experience) {
-        logger.info("Adding {} tier experience to userID: {}", experience, userID);
-        userMapper.updateUserExperience(userID, experience);
-        logger.info("Tier experience added successfully for userID: {}", userID);
+    	int currentTierExperience = userMapper.getTierExperience(userID);
+        
+        // 새로운 티어 경험치 계산
+        int newTierExperience = experience;
+        
+        // 유저 레벨 가져오기
+        int userLevel = userMapper.getUserLevel(userID); // 유저 레벨 조회
+        
+        // 현재 유저의 티어 가져오기
+        String currentTier = userMapper.getTier(userID); // 현재 티어 조회
+        
+        // 티어 변경 로직
+        if (currentTier.equals("대리") && userLevel >= 30 && currentTierExperience + newTierExperience >= 100) {
+            // 티어를 과장으로 변경
+            userMapper.updateTier(userID, "과장"); // "과장"으로 업데이트
+            userMapper.updateToken(userID, 5000); // Token 필드에 5000 추가 (과장 승진 시 추가할 Token)
+            newTierExperience -= 100; // 티어 경험치 -100
+        }
+          else if (currentTier.equals("주임") && userLevel >= 20 && currentTierExperience + newTierExperience >= 100) {
+            // 티어를 대리로 변경
+            userMapper.updateTier(userID, "대리"); // "대리"로 업데이트
+            userMapper.updateToken(userID, 3000); // Token 필드에 3000 추가
+            newTierExperience -= 100; // 티어 경험치 -100
+        } else if (currentTier.equals("신입사원") && userLevel >= 10 && currentTierExperience + newTierExperience >= 100 ) {
+            // 티어를 주임으로 변경
+            userMapper.updateTier(userID, "주임"); // "주임"으로 업데이트
+            userMapper.updateToken(userID, 1000); // Token 필드에 1000 추가
+            newTierExperience -= 100; // 티어 경험치 -100
+        }
+        
+        // 유저 티어 경험치 업데이트
+        userMapper.updateUserExperience(userID, newTierExperience);
+        
     }
     
 
