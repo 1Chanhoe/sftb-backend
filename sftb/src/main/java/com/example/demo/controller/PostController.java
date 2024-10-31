@@ -36,6 +36,7 @@ public class PostController {
         post.setContent(postRequest.getContent());
         post.setBoardId(postRequest.getBoardId()); // boardId 설정
         post.setViewCount(0); // 초기 조회수 설정
+        post.setUserId(postRequest.getUserId());
 
         postService.createPost(post);
 
@@ -81,30 +82,23 @@ public class PostController {
     }
 
     
-    // 게시글 수정 API
+ // 게시글 수정 API
     @PutMapping("/{postId}")
-    public ResponseEntity<PostDto> updatePost(
+    public ResponseEntity<Post> updatePost(
         @PathVariable("postId") Long postId,
         @RequestBody PostDto postDto
     ) {
-        logger.info("Received update request for postId: {} with title: {} and content: {}", postId, postDto.getTitle(), postDto.getContent());
+        // 게시글 수정 서비스 호출
+        Post updatedPost = postService.updatePost(postId, postDto);
         
-        boolean isUpdated = postService.updatePost(postId, postDto);
-        
-        if (isUpdated) {
-            // 수정된 게시글을 다시 조회하여 최신 데이터를 클라이언트에 반환
-            Post updatedPost = postService.getPostById(postId);
-            PostDto updatedPostDto = new PostDto();
-            updatedPostDto.setTitle(updatedPost.getTitle());
-            updatedPostDto.setContent(updatedPost.getContent());
-            updatedPostDto.setPostId(updatedPost.getPostId());
-            updatedPostDto.setUpdateAt(updatedPost.getUpdateAt());
-
-            return ResponseEntity.ok(updatedPostDto); // 수정된 게시글 정보 반환
-        } else {	
-            return ResponseEntity.status(404).body(null); // Post not found
+        if (updatedPost != null) {
+            return ResponseEntity.ok(updatedPost); // 수정된 게시글 객체 반환
+        } else {    
+            return ResponseEntity.status(404).body(null); // 게시글이 존재하지 않음
         }
     }
+
+
 
     // 게시물 삭제
     @DeleteMapping("/{postId}")

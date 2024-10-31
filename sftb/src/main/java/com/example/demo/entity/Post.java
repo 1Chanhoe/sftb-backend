@@ -35,6 +35,9 @@ public class Post {
 
     @Column(name = "Board_ID", nullable = false) // 게시판 ID 필드 (NOT NULL)
     private Integer boardId; // 게시판 ID (외래키)
+    
+    @Column(name = "UserID")
+    private String userId;
 
     // Getter and Setter for postId
     public Long getPostId() {
@@ -114,6 +117,14 @@ public class Post {
     public void setBoardId(Integer boardId) {
         this.boardId = boardId;
     }
+    
+    public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
 
     // 생성된 시점에 기본적으로 작성 시간을 현재 시간으로 설정
     @PrePersist

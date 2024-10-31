@@ -9,8 +9,8 @@ import java.util.List;
 public interface PostMapper {
 
     // 게시물 작성
-    @Insert("INSERT INTO post (Title, Member_ID, Content, ViewCount, Create_At, Board_ID) " +
-            "VALUES (#{title}, #{userName}, #{content}, #{viewCount}, NOW(), #{boardId})")
+    @Insert("INSERT INTO post (Title, Member_ID, Content, ViewCount, Create_At, Board_ID, UserID) " +
+            "VALUES (#{title}, #{userName}, #{content}, #{viewCount}, NOW(), #{boardId}, #{userId})")
     @Options(useGeneratedKeys = true, keyProperty = "postId") // AUTO_INCREMENT 컬럼이 있는 경우
     void insertPost(Post post);
 
@@ -30,12 +30,14 @@ public interface PostMapper {
     List<Post> findAllPosts();
    
  // 게시물 수정
-    @Update("UPDATE post SET Title = #{title}, Content = #{content}, Update_At = #{updateAt} WHERE Post_ID = #{postId}")
-    void updatePost(@Param("postId") Long postId, @Param("title") String title, @Param("content") String content, @Param("updateAt") LocalDateTime updateAt);
+    @Update("UPDATE post SET Title = #{title}, Content = #{content}, Update_At = NOW() WHERE Post_ID = #{postId}")
+    void updatePost(@Param("postId") Long postId, @Param("title") String title, @Param("content") String content);
 
 
-    // 게시물 조회
-    @Select("SELECT * FROM post WHERE Post_ID = #{postId}")
+ // 게시글 ID로 게시글을 조회하는 메서드
+    @Select("SELECT Post_ID AS postId, Title AS title, Content AS content, " +
+            "Member_ID AS memberId, Create_At AS createdAt, Update_At AS updateAt " +
+            "FROM post WHERE Post_ID = #{postId}")
     Post findPostById(@Param("postId") Long postId);
 
     
