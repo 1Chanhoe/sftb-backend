@@ -16,7 +16,7 @@ public class Comment {
     private String memberId;    // 작성자 ID (Member_ID)
     private LocalDateTime createdAt; // 작성 시간 (Created_At)
     private LocalDateTime updatedAt; // 수정 시간 (Update_At)
-    private Byte adopt;         // 채택 여부 (Adopt)
+    private Boolean adopt;         // 채택 여부 (Adopt)
     private Integer heart;      // 좋아요 수 (Heart)
     private Long postId;        // 게시글 ID (Post_ID)
     private String userId;
@@ -79,11 +79,11 @@ public class Comment {
         this.updatedAt = updatedAt;
     }
 
-    public Byte getAdopt() {
+    public Boolean getAdopt() {
         return adopt;
     }
 
-    public void setAdopt(Byte adopt) {
+    public void setAdopt(Boolean adopt) {
         this.adopt = adopt;
     }
 

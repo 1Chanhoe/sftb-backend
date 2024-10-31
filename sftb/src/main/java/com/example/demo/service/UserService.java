@@ -1,12 +1,7 @@
 package com.example.demo.service;
 
-
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.example.demo.entity.User;
@@ -25,22 +20,18 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-
-    
     // 회원가입 메서드 (ID, 학번, 이메일 중복 확인 로직 MyBatis 사용)
     @Transactional
     public void signUp(User user) throws BadRequestException {
         StringBuilder errorMessage = new StringBuilder();
-
         boolean hasError = false;
-
 
         // 학번 중복 확인
         if (userMapper.existsByStudentID(user.getStudentID())) {
             errorMessage.append("Student ID already exists. ");
             hasError = true;
         }
-        
+
         // ID 중복 확인
         if (userMapper.existsByUserID(user.getUserID())) {
             errorMessage.append("User ID already exists. ");
@@ -62,14 +53,13 @@ public class UserService {
         // 비밀번호 암호화
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
+        // 신규 회원 여부 설정
+        user.setNewMember(true); // 신규 회원이면 true로 설정
+
         // MyBatis를 사용하여 사용자 저장
         userMapper.insertUser(user);
         logger.info("User signed up successfully with userID: {}", user.getUserID());
     }
-
-
-    // 로그인 메서드, 사용자 ID 찾기, 비밀번호 찾기 및 비밀번호 변경 메서드는 기존과 동일합니다.
-
 
     // 로그인 메서드 (MyBatis 사용)
     public User loginUser(String userID, String password) {
@@ -128,8 +118,77 @@ public class UserService {
             return true;
         }
         logger.warn("Failed to reset password for userID: {}", userID);
-
         return false;
     }
-}
 
+    
+    // 유저 티어 경험치 추가 메서드
+    @Transactional
+    public void addTierExperience(String userID, int experience) {
+        logger.info("Adding {} tier experience to userID: {}", experience, userID);
+        userMapper.updateUserExperience(userID, experience);
+        logger.info("Tier experience added successfully for userID: {}", userID);
+    }
+    
+    // 유저 레벨 경험치 추가 메서드
+    @Transactional
+    public void updateUserLevelExperience(String userId, int experience) {
+        userMapper.updateUserLevelExperience(userId, experience);
+    }
+
+
+
+    // 신규 회원 상태 업데이트 메서드
+    public void updateNewMemberStatus(String userID, boolean newMember) {
+        int newMemberValue = newMember ? 1 : 0; // boolean 값을 int로 변환
+        logger.info("Attempting to update new member status to {} for userID: {}", newMemberValue, userID);
+        userMapper.updateNewMember(userID, newMemberValue); // newMember 상태 업데이트
+        logger.info("New member status updated for userID: {}", userID);
+    }
+
+    // 사용자 ID로 유저 찾기
+    public User findById(String userID) {
+        if (userID == null) {
+            throw new RuntimeException("User ID cannot be null");
+        }
+
+        User user = userMapper.findByUserId(userID);
+        
+        if (user == null) {
+            throw new RuntimeException("User not found for ID: " + userID);
+        }
+        
+        return user; // 사용자가 존재하면 반환
+    }
+
+    // 사용자 정보 업데이트 메서드
+    public void updateUser(User user) {
+        userMapper.updateUser(user); // 사용자 정보를 저장하여 업데이트
+    }
+    
+ // 사용자 경험치 가져오기 메서드
+    public int getExperiencePoints(String userID) {
+        User user = userMapper.findByUserId(userID);
+        if (user != null) {
+            return user.getExperiencePoints();
+        } else {
+            logger.warn("User not found for userID: {}", userID);
+            throw new RuntimeException("User not found");
+        }
+    }
+    
+    // 경험치 업데이트 메서드
+    public void updateExperiencePoints(String userID, int experiencePoints) {
+        User user = userMapper.findByUserId(userID);
+        if (user != null) {
+            int currentExperiencePoints = user.getExperiencePoints();
+            int newExperiencePoints = currentExperiencePoints + experiencePoints; // 기존 경험치에 추가
+            userMapper.updateExperiencePoints(userID, newExperiencePoints);
+            logger.info("Experience points updated for userID: {}. Previous: {}, Added: {}, New total: {}", userID, currentExperiencePoints, experiencePoints, newExperiencePoints);
+        } else {
+            logger.warn("User not found for userID: {}", userID);
+            throw new RuntimeException("User not found");
+        }
+    }
+
+}

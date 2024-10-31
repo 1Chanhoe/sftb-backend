@@ -8,6 +8,8 @@ public class CommentRequest {
     private String memberId; // 작성자 ID 추가 (필요한 경우)
     private Long parentId;
     private String userId; // 사용자 ID 추가
+    private int tierExperience; // 티어 경험치 추가
+    private boolean adopt;
     // Getters and Setters
     public Long getPostId() {
         return postId;
@@ -57,6 +59,23 @@ public class CommentRequest {
         comment.setMemberId(this.memberId); // 필요한 경우 설정
         comment.setParentSeq(this.parentId);
         comment.setUserId(this.userId);
+        comment.setAdopt(this.adopt);
         return comment;
     }
+
+	public int getTierExperience() {
+		return tierExperience;
+	}
+
+	public void setTierExperience(int tierExperience) {
+		this.tierExperience = tierExperience;
+	}
+
+	public boolean isAdopt() {
+		return adopt;
+	}
+
+	public void setAdopt(boolean adopt) {
+		this.adopt = adopt;
+	}
 }

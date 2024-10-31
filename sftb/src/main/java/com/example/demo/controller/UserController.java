@@ -16,7 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-
+import com.example.demo.dto.UserExperienceUpdateRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,19 +36,13 @@ public class UserController {
         if (session != null) {
             session.invalidate();
         }
-        
-
-
         // JSESSIONID 쿠키 삭제
         Cookie cookie = new Cookie("JSESSIONID", null);
         cookie.setPath("/"); // 쿠키 경로 설정
         cookie.setHttpOnly(true); // 보안 설정
         cookie.setMaxAge(0); // 쿠키 만료 시간 0으로 설정 (즉시 삭제)
         response.addCookie(cookie);
-
         return ResponseEntity.ok("Logged out successfully");
-
-
 
     }
 
@@ -67,7 +61,7 @@ public class UserController {
         }
 
     }
-
+    
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody User loginRequest) {
@@ -131,11 +125,70 @@ public class UserController {
             return ResponseEntity.status(400).body("Failed to reset password."); // 실패 시 400 상태 코드 반환
         }
     }
+    
+ // 신규 회원 상태 업데이트 메서드
+    @PutMapping("/users/{userID}/newmember") 
+    public ResponseEntity<?> updateNewMemberStatus(@PathVariable("userID") String userID) {
+        logger.info("Updating new member status for userID: {}", userID);
+        
+        try {
+            userService.updateNewMemberStatus(userID, false); // 사용자 상태를 false로 업데이트
+            return ResponseEntity.ok("New member status updated successfully."); // 성공 메시지 반환
+        } catch (Exception e) {
+            logger.error("Failed to update new member status for userID: {}", userID, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update new member status."); // 실패 메시지 반환
+        }
+    }
+    
+    
+    @PutMapping("/users/{userID}/experience")
+    public ResponseEntity<?> updateExperiencePoints(
+        @PathVariable("userID") String userID,
+        @RequestBody Map<String, Integer> request) {
+
+        logger.info("Updating experience points for userID: {}", userID);
+        
+        try {
+            int experiencePoints = request.get("experiencePoints");
+            userService.updateExperiencePoints(userID, experiencePoints);
+            return ResponseEntity.ok("Experience points updated successfully."); // 성공 메시지 반환
+        } catch (Exception e) {
+            logger.error("Failed to update experience points for userID: {}", userID, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update experience points."); // 실패 메시지 반환
+        }
+    }
+    
+    @GetMapping("/users/{userID}/experience")
+    public ResponseEntity<?> getExperiencePoints(@PathVariable("userID") String userID) {
+        logger.info("Fetching experience points for userID: {}", userID);
+        
+        try {
+            int experiencePoints = userService.getExperiencePoints(userID);
+            return ResponseEntity.ok(Map.of("experiencePoints", experiencePoints));
+        } catch (Exception e) {
+            logger.error("Failed to fetch experience points for userID: {}", userID, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Failed to fetch experience points.");
+        }
+    }
+
+
+    
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<Map<String, String>> handleBadRequest(BadRequestException ex) {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("message", ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
+
+
+
+    
+    @PutMapping("/experience")
+    public ResponseEntity<User> updateExperience(@RequestBody UserExperienceUpdateRequest userLevelExperience) {
+        userService.updateUserLevelExperience(userLevelExperience.getUserId(), userLevelExperience.getUserLevelExperience());
+        return ResponseEntity.ok().build();
+    }
 }
+
 
