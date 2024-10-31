@@ -29,34 +29,16 @@ public class PostController {
 
     // 게시물 작성
     @PostMapping
-    public ResponseEntity<?> createPost(
-        @RequestParam("title") String title,
-        @RequestParam("content") String content,
-        @RequestParam("userName") String userName,
-        @RequestParam("boardId") Integer boardId,
-        @RequestParam(value = "file", required = false) MultipartFile file // 파일 받기
-    ) {
+    public ResponseEntity<?> createPost(@RequestBody PostRequest postRequest) 
+    {
         Post post = new Post();
-        post.setTitle(title);
-        post.setUserName(userName);
-        post.setContent(content);
-        post.setBoardId(boardId);
-        post.setViewCount(0);
+        post.setTitle(postRequest.getTitle());
+        post.setUserName(postRequest.getUserName()); // Member_ID를 userName으로 사용
+        post.setContent(postRequest.getContent());
+        post.setBoardId(postRequest.getBoardId()); // boardId 설정
+        post.setViewCount(0); // 초기 조회수 설정
+        post.setUserId(postRequest.getUserId());
 
-        // 파일이 있는 경우 저장
-        if (file != null && !file.isEmpty()) {
-            try {
-                String fileName = file.getOriginalFilename();
-                Path filePath = Paths.get("uploads/" + fileName);
-                Files.copy(file.getInputStream(), filePath);
-
-                // 파일 경로 설정
-                post.setFilePath(filePath.toString());
-            } catch (Exception e) {
-                e.printStackTrace();
-                return ResponseEntity.status(500).body("파일 업로드에 실패했습니다.");
-            }
-        }
 
         postService.createPost(post);
         return ResponseEntity.ok(post);
@@ -101,30 +83,23 @@ public class PostController {
     }
 
     
-    // 게시글 수정 API
+ // 게시글 수정 API
     @PutMapping("/{postId}")
-    public ResponseEntity<PostDto> updatePost(
+    public ResponseEntity<Post> updatePost(
         @PathVariable("postId") Long postId,
         @RequestBody PostDto postDto
     ) {
-        logger.info("Received update request for postId: {} with title: {} and content: {}", postId, postDto.getTitle(), postDto.getContent());
+        // 게시글 수정 서비스 호출
+        Post updatedPost = postService.updatePost(postId, postDto);
         
-        boolean isUpdated = postService.updatePost(postId, postDto);
-        
-        if (isUpdated) {
-            // 수정된 게시글을 다시 조회하여 최신 데이터를 클라이언트에 반환
-            Post updatedPost = postService.getPostById(postId);
-            PostDto updatedPostDto = new PostDto();
-            updatedPostDto.setTitle(updatedPost.getTitle());
-            updatedPostDto.setContent(updatedPost.getContent());
-            updatedPostDto.setPostId(updatedPost.getPostId());
-            updatedPostDto.setUpdateAt(updatedPost.getUpdateAt());
-
-            return ResponseEntity.ok(updatedPostDto); // 수정된 게시글 정보 반환
-        } else {	
-            return ResponseEntity.status(404).body(null); // Post not found
+        if (updatedPost != null) {
+            return ResponseEntity.ok(updatedPost); // 수정된 게시글 객체 반환
+        } else {    
+            return ResponseEntity.status(404).body(null); // 게시글이 존재하지 않음
         }
     }
+
+
 
     // 게시물 삭제
     @DeleteMapping("/{postId}")

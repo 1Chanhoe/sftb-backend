@@ -41,13 +41,12 @@ public class Post {
     private String filePath;
 
     // Getter and Setter for filePath
-    public String getFilePath() {
-        return filePath;
-    }
+ 
 
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
-    }
+    
+    @Column(name = "UserID")
+    private String userId;
+
 
     // Getter and Setter for postId
     public Long getPostId() {
@@ -127,6 +126,14 @@ public class Post {
     public void setBoardId(Integer boardId) {
         this.boardId = boardId;
     }
+    
+    public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
 
     // 생성된 시점에 기본적으로 작성 시간을 현재 시간으로 설정
     @PrePersist
@@ -138,5 +145,13 @@ public class Post {
     @PreUpdate
     public void preUpdate() {
         this.updateAt = LocalDateTime.now();
+    }
+    
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 }
