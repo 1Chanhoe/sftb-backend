@@ -5,6 +5,7 @@ public class PostRequest {
     private String userName; // 변경된 필드 이름
     private String content;
     private int boardId; // 게시판 ID 추가
+    private String userId; 
 
     // Getters and Setters
     public String getTitle() {
@@ -38,4 +39,12 @@ public class PostRequest {
     public void setBoardId(int boardId) {
         this.boardId = boardId; // 게시판 ID Setter
     }
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
 }

@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.CommentRequest;
 import com.example.demo.dto.ResetPasswordRequest;
 
 import com.example.demo.entity.User;
@@ -111,6 +112,7 @@ public class UserController {
             return ResponseEntity.status(404).body("Password not found"); // 실패 시 404 상태 코드 반환
         }
     }
+    
 
     // 비밀번호 재설정 요청을 처리하는 메서드
     @PostMapping("/reset-password")
@@ -126,7 +128,7 @@ public class UserController {
         }
     }
     
- // 신규 회원 상태 업데이트 메서드
+    // 신규 회원 상태 업데이트 메서드
     @PutMapping("/users/{userID}/newmember") 
     public ResponseEntity<?> updateNewMemberStatus(@PathVariable("userID") String userID) {
         logger.info("Updating new member status for userID: {}", userID);
@@ -142,15 +144,15 @@ public class UserController {
     
     
     @PutMapping("/users/{userID}/experience")
-    public ResponseEntity<?> updateExperiencePoints(
+    public ResponseEntity<?> updateUserLevelExperience(
         @PathVariable("userID") String userID,
         @RequestBody Map<String, Integer> request) {
 
         logger.info("Updating experience points for userID: {}", userID);
         
         try {
-            int experiencePoints = request.get("experiencePoints");
-            userService.updateExperiencePoints(userID, experiencePoints);
+            int userLevelExperience = request.get("userLevelExperience");
+            userService.updateUserLevelExperience(userID, userLevelExperience);
             return ResponseEntity.ok("Experience points updated successfully."); // 성공 메시지 반환
         } catch (Exception e) {
             logger.error("Failed to update experience points for userID: {}", userID, e);
@@ -159,12 +161,16 @@ public class UserController {
     }
     
     @GetMapping("/users/{userID}/experience")
-    public ResponseEntity<?> getExperiencePoints(@PathVariable("userID") String userID) {
+    public ResponseEntity<?> getUserExperience(@PathVariable("userID") String userID) {
         logger.info("Fetching experience points for userID: {}", userID);
         
         try {
-            int experiencePoints = userService.getExperiencePoints(userID);
-            return ResponseEntity.ok(Map.of("experiencePoints", experiencePoints));
+            int userLevelExperience = userService.getUserLevelExperience(userID);
+            int tierExperience = userService.getTierExperience(userID); // 티어 경험치 가져오기
+            Map<String, Integer> experienceData = new HashMap<>();
+            experienceData.put("userLevelExperience", userLevelExperience);
+            experienceData.put("tierExperience", tierExperience);
+            return ResponseEntity.ok(experienceData);
         } catch (Exception e) {
             logger.error("Failed to fetch experience points for userID: {}", userID, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -181,13 +187,18 @@ public class UserController {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-
-
     
     @PutMapping("/experience")
     public ResponseEntity<User> updateExperience(@RequestBody UserExperienceUpdateRequest userLevelExperience) {
         userService.updateUserLevelExperience(userLevelExperience.getUserId(), userLevelExperience.getUserLevelExperience());
         return ResponseEntity.ok().build();
+    }
+    
+    @PutMapping("/tier-experience")
+    public ResponseEntity<String> updateTierExperience(@RequestBody CommentRequest commentRequest) {
+        // CommentRequest에서 사용자 ID와 경험치 업데이트 값을 가져옴
+        userService.addTierExperience(commentRequest.getUserId(), commentRequest.getTierExperience());
+        return ResponseEntity.ok("티어 경험치가 성공적으로 업데이트되었습니다.");
     }
 }
 

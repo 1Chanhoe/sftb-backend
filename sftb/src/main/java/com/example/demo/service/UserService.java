@@ -19,7 +19,11 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
+    
+    public UserService(UserMapper userMapper) {
+        this.userMapper = userMapper;
+    }
+    
     // 회원가입 메서드 (ID, 학번, 이메일 중복 확인 로직 MyBatis 사용)
     @Transactional
     public void signUp(User user) throws BadRequestException {
@@ -125,17 +129,59 @@ public class UserService {
     // 유저 티어 경험치 추가 메서드
     @Transactional
     public void addTierExperience(String userID, int experience) {
-        logger.info("Adding {} tier experience to userID: {}", experience, userID);
-        userMapper.updateUserExperience(userID, experience);
-        logger.info("Tier experience added successfully for userID: {}", userID);
+    	int currentTierExperience = userMapper.getTierExperience(userID);
+        
+        // 새로운 티어 경험치 계산
+        int newTierExperience = experience;
+        
+        // 유저 레벨 가져오기
+        int userLevel = userMapper.getUserLevel(userID); // 유저 레벨 조회
+        
+        // 현재 유저의 티어 가져오기
+        String currentTier = userMapper.getTier(userID); // 현재 티어 조회
+        
+        // 티어 변경 로직
+        if (currentTier.equals("주임") && userLevel >= 30 && currentTierExperience + newTierExperience >= 100) {
+            // 티어를 과장으로 변경
+            userMapper.updateTier(userID, "대리"); // "과장"으로 업데이트
+            userMapper.updateToken(userID, 5000); // Token 필드에 5000 추가 (과장 승진 시 추가할 Token)
+            newTierExperience -= 100; // 티어 경험치 -100
+        }
+          else if (currentTier.equals("사원") && userLevel >= 20 && currentTierExperience + newTierExperience >= 100) {
+            // 티어를 대리로 변경
+            userMapper.updateTier(userID, "주임"); // "대리"로 업데이트
+            userMapper.updateToken(userID, 3000); // Token 필드에 3000 추가
+            newTierExperience -= 100; // 티어 경험치 -100
+        } else if (currentTier.equals("인턴") && userLevel >= 10 && currentTierExperience + newTierExperience >= 100 ) {
+            // 티어를 주임으로 변경
+            userMapper.updateTier(userID, "사원"); // "주임"으로 업데이트
+            userMapper.updateToken(userID, 1000); // Token 필드에 1000 추가
+            newTierExperience -= 100; // 티어 경험치 -100
+        }
+        
+        // 유저 티어 경험치 업데이트
+        userMapper.updateUserExperience(userID, newTierExperience);
+        
     }
     
+
     // 유저 레벨 경험치 추가 메서드
     @Transactional
     public void updateUserLevelExperience(String userId, int experience) {
-        userMapper.updateUserLevelExperience(userId, experience);
-    }
+        // 현재 유저 레벨 경험치 가져오기
+        int currentLevelExperience = userMapper.getUserLevelExperience(userId);
+        
+        // 새로운 유저 레벨 경험치 계산
+        int newLevelExperience = experience;
 
+
+        // 유저 레벨 경험치가 100 이상일 경우 처리
+        if (currentLevelExperience + newLevelExperience >= 100) {
+            newLevelExperience -= 100; // 100을 초과하는 부분만 남기고 초기화
+            userMapper.updateUserLevel(userId); // UserLevel 필드 +1 증가
+        }
+        userMapper.updateUserLevelExperience(userId, newLevelExperience);
+    }
 
 
     // 신규 회원 상태 업데이트 메서드
@@ -145,50 +191,29 @@ public class UserService {
         userMapper.updateNewMember(userID, newMemberValue); // newMember 상태 업데이트
         logger.info("New member status updated for userID: {}", userID);
     }
-
-    // 사용자 ID로 유저 찾기
-    public User findById(String userID) {
-        if (userID == null) {
-            throw new RuntimeException("User ID cannot be null");
-        }
-
-        User user = userMapper.findByUserId(userID);
-        
-        if (user == null) {
-            throw new RuntimeException("User not found for ID: " + userID);
-        }
-        
-        return user; // 사용자가 존재하면 반환
-    }
-
-    // 사용자 정보 업데이트 메서드
-    public void updateUser(User user) {
-        userMapper.updateUser(user); // 사용자 정보를 저장하여 업데이트
-    }
     
- // 사용자 경험치 가져오기 메서드
-    public int getExperiencePoints(String userID) {
+    // 사용자 경험치 가져오기 메서드
+    public int getUserLevelExperience(String userID) {
+
         User user = userMapper.findByUserId(userID);
         if (user != null) {
-            return user.getExperiencePoints();
+            return user.getUserLevelExperience();
         } else {
             logger.warn("User not found for userID: {}", userID);
             throw new RuntimeException("User not found");
         }
     }
     
-    // 경험치 업데이트 메서드
-    public void updateExperiencePoints(String userID, int experiencePoints) {
-        User user = userMapper.findByUserId(userID);
-        if (user != null) {
-            int currentExperiencePoints = user.getExperiencePoints();
-            int newExperiencePoints = currentExperiencePoints + experiencePoints; // 기존 경험치에 추가
-            userMapper.updateExperiencePoints(userID, newExperiencePoints);
-            logger.info("Experience points updated for userID: {}. Previous: {}, Added: {}, New total: {}", userID, currentExperiencePoints, experiencePoints, newExperiencePoints);
+    public int getTierExperience(String userID) {
+        Integer tierExperience = userMapper.getTierExperience(userID);
+        if (tierExperience != null) {
+            return tierExperience;
         } else {
-            logger.warn("User not found for userID: {}", userID);
-            throw new RuntimeException("User not found");
+            logger.warn("Tier experience not found for userID: {}", userID);
+            throw new RuntimeException("Tier experience not found for user");
         }
     }
+    
+    
 
 }

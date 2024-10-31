@@ -10,7 +10,7 @@ import com.example.demo.entity.User;
 @Mapper
 public interface UserMapper {
     // 사용자 삽입
-    @Insert("INSERT INTO customers (UserID, StudentID, Password, UserName, Email, NewMember, ExperiencePoints) VALUES (#{userID}, #{studentID}, #{password}, #{userName}, #{email}, #{newMember}, #{experiencePoints})")
+    @Insert("INSERT INTO customers (UserID, StudentID, Password, UserName, Email, NewMember,  UserLevel_Experience) VALUES (#{userID}, #{studentID}, #{password}, #{userName}, #{email}, #{newMember}, #{userLevelExperience})")
     void insertUser(User user);
 
     // UserID로 사용자 검색
@@ -44,23 +44,41 @@ public interface UserMapper {
     // 이메일로 중복 체크
     @Select("SELECT COUNT(*) > 0 FROM customers WHERE Email = #{email}")
     boolean existsByEmail(@Param("email") String email);
+    
+    // 유저레벨경험치 업데이트
+    @Update("UPDATE customers SET UserLevel_Experience = COALESCE(UserLevel_Experience, 0) + #{userLevelExperience} WHERE UserID = #{userId}")
+    void updateUserLevelExperience(@Param("userId") String userId, @Param("userLevelExperience") int userLevelExperience);
 
-    //티어경험치 추가 COALESCE()는 NULL인경우 0을반환, 아닐경우 그값을 그대로 반영함 나중에 레벨,티어 업데이트할때도 사용해야할거같음
+    // 유저 레벨 증가
+    @Update("UPDATE customers SET UserLevel = COALESCE(UserLevel, 0) + 1 WHERE UserID = #{userId}")
+    void updateUserLevel(@Param("userId") String userId);
+
+    // 현재 유저 레벨 경험치 조회
+    @Select("SELECT COALESCE(UserLevel_Experience, 0) FROM customers WHERE UserID = #{userId}")
+    int getUserLevelExperience(String userId);
+    
+    // 현재 유저 레벨 조회
+    @Select("SELECT UserLevel FROM customers WHERE UserID = #{userId}")
+    int getUserLevel(String userId);
+    
+    // 현재 유저의 티어 경험치 조회
+    @Select("SELECT COALESCE(Tier_Experience, 0) FROM customers WHERE UserID = #{userId}")
+    int getTierExperience(String userId);
+    
+    // 현재 유저의 티어 조회
+    @Select("SELECT Tier FROM customers WHERE UserID = #{userId}")
+    String getTier(String userId); // 유저의 현재 티어를 반환
+    
+    // 티어 업데이트
+    @Update("UPDATE customers SET Tier = #{tier} WHERE UserID = #{userId}")
+    void updateTier(@Param("userId") String userId, @Param("tier") String tier);
+    
+    // 티어경험치 업데이트 COALESCE()는 NULL인경우 0을반환, 아닐경우 그값을 그대로 반영함 나중에 레벨,티어 업데이트할때도 사용해야할거같음
     @Update("UPDATE customers SET Tier_Experience = COALESCE(Tier_Experience, 0) + #{experience} WHERE UserID = #{userID}")
     void updateUserExperience(@Param("userID") String userID, @Param("experience") int experience);
     
-    // 경험치 업데이트
-    @Update("UPDATE customers SET UserLevel_Experience = COALESCE(UserLevel_Experience, 0) + #{experience} WHERE UserID = #{userId}")
-    void updateUserLevelExperience(@Param("userId") String userId, @Param("experience") int experience);
-
-
-
-    // 경험치 업데이트
-    @Update("UPDATE customers SET ExperiencePoints = #{experiencePoints} WHERE UserID = #{userID}")
-    void updateExperiencePoints(@Param("userID") String userID, @Param("experiencePoints") int experiencePoints);
-    
-    @Select("SELECT ExperiencePoints FROM customers WHERE UserID = #{userID}")
-    int findExperiencePointsByUserId(@Param("userID") String userID);
-
+    // Token 업데이트
+    @Update("UPDATE customers SET Token = COALESCE(Token, 0) + #{amount} WHERE UserID = #{userId}")
+    void updateToken(@Param("userId") String userId, @Param("amount") int amount);
 
 }
