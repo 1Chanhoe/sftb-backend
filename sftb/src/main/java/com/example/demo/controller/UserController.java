@@ -112,6 +112,7 @@ public class UserController {
             return ResponseEntity.status(404).body("Password not found"); // 실패 시 404 상태 코드 반환
         }
     }
+    
 
     // 비밀번호 재설정 요청을 처리하는 메서드
     @PostMapping("/reset-password")
@@ -160,12 +161,16 @@ public class UserController {
     }
     
     @GetMapping("/users/{userID}/experience")
-    public ResponseEntity<?> getUserLevelExperience(@PathVariable("userID") String userID) {
+    public ResponseEntity<?> getUserExperience(@PathVariable("userID") String userID) {
         logger.info("Fetching experience points for userID: {}", userID);
         
         try {
-            int experience = userService.getUserLevelExperience(userID);
-            return ResponseEntity.ok(Map.of("userLevelExperience", experience));
+            int userLevelExperience = userService.getUserLevelExperience(userID);
+            int tierExperience = userService.getTierExperience(userID); // 티어 경험치 가져오기
+            Map<String, Integer> experienceData = new HashMap<>();
+            experienceData.put("userLevelExperience", userLevelExperience);
+            experienceData.put("tierExperience", tierExperience);
+            return ResponseEntity.ok(experienceData);
         } catch (Exception e) {
             logger.error("Failed to fetch experience points for userID: {}", userID, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -182,6 +187,7 @@ public class UserController {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    
     @PutMapping("/experience")
     public ResponseEntity<User> updateExperience(@RequestBody UserExperienceUpdateRequest userLevelExperience) {
         userService.updateUserLevelExperience(userLevelExperience.getUserId(), userLevelExperience.getUserLevelExperience());

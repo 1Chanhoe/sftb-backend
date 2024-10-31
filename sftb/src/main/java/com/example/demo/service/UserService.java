@@ -141,20 +141,20 @@ public class UserService {
         String currentTier = userMapper.getTier(userID); // 현재 티어 조회
         
         // 티어 변경 로직
-        if (currentTier.equals("대리") && userLevel >= 30 && currentTierExperience + newTierExperience >= 100) {
+        if (currentTier.equals("주임") && userLevel >= 30 && currentTierExperience + newTierExperience >= 100) {
             // 티어를 과장으로 변경
-            userMapper.updateTier(userID, "과장"); // "과장"으로 업데이트
+            userMapper.updateTier(userID, "대리"); // "과장"으로 업데이트
             userMapper.updateToken(userID, 5000); // Token 필드에 5000 추가 (과장 승진 시 추가할 Token)
             newTierExperience -= 100; // 티어 경험치 -100
         }
-          else if (currentTier.equals("주임") && userLevel >= 20 && currentTierExperience + newTierExperience >= 100) {
+          else if (currentTier.equals("사원") && userLevel >= 20 && currentTierExperience + newTierExperience >= 100) {
             // 티어를 대리로 변경
-            userMapper.updateTier(userID, "대리"); // "대리"로 업데이트
+            userMapper.updateTier(userID, "주임"); // "대리"로 업데이트
             userMapper.updateToken(userID, 3000); // Token 필드에 3000 추가
             newTierExperience -= 100; // 티어 경험치 -100
-        } else if (currentTier.equals("신입사원") && userLevel >= 10 && currentTierExperience + newTierExperience >= 100 ) {
+        } else if (currentTier.equals("인턴") && userLevel >= 10 && currentTierExperience + newTierExperience >= 100 ) {
             // 티어를 주임으로 변경
-            userMapper.updateTier(userID, "주임"); // "주임"으로 업데이트
+            userMapper.updateTier(userID, "사원"); // "주임"으로 업데이트
             userMapper.updateToken(userID, 1000); // Token 필드에 1000 추가
             newTierExperience -= 100; // 티어 경험치 -100
         }
@@ -174,6 +174,7 @@ public class UserService {
         // 새로운 유저 레벨 경험치 계산
         int newLevelExperience = experience;
 
+
         // 유저 레벨 경험치가 100 이상일 경우 처리
         if (currentLevelExperience + newLevelExperience >= 100) {
             newLevelExperience -= 100; // 100을 초과하는 부분만 남기고 초기화
@@ -181,6 +182,7 @@ public class UserService {
         }
         userMapper.updateUserLevelExperience(userId, newLevelExperience);
     }
+
 
     // 신규 회원 상태 업데이트 메서드
     public void updateNewMemberStatus(String userID, boolean newMember) {
@@ -199,6 +201,16 @@ public class UserService {
         } else {
             logger.warn("User not found for userID: {}", userID);
             throw new RuntimeException("User not found");
+        }
+    }
+    
+    public int getTierExperience(String userID) {
+        Integer tierExperience = userMapper.getTierExperience(userID);
+        if (tierExperience != null) {
+            return tierExperience;
+        } else {
+            logger.warn("Tier experience not found for userID: {}", userID);
+            throw new RuntimeException("Tier experience not found for user");
         }
     }
     

@@ -21,10 +21,15 @@ public class PostService {
     // 게시물 작성
     public void createPost(Post post) {
         logger.info("Creating a new post with title: {} by userName: {} and boardId: {}", post.getTitle(), post.getUserName(), post.getBoardId());
+
+        // 파일 경로 로그 추가
+        if (post.getFilePath() != null) {
+            logger.info("File path for the post: {}", post.getFilePath());
+        }
+
         postMapper.insertPost(post);
         logger.info("Post created successfully with Post_ID: {}", post.getPostId());
     }
-
     // 게시물 목록 가져오기
     public List<Post> getAllPosts() {
         logger.info("Fetching all posts");
@@ -57,8 +62,8 @@ public class PostService {
     }
 
 
-    // 게시물 수정
-    public boolean updatePost(Long postId, PostDto postDto) {
+ // 게시물 수정
+    public Post updatePost(Long postId, PostDto postDto) {
         logger.info("Updating post with ID: {}", postId);
 
         // 해당 ID의 게시글을 찾음
@@ -70,13 +75,15 @@ public class PostService {
         // PostDto에서 받은 데이터를 Post 엔티티에 직접 업데이트
         existingPost.setTitle(postDto.getTitle());
         existingPost.setContent(postDto.getContent());
-        existingPost.setUpdateAt(LocalDateTime.now());
+        existingPost.setUpdateAt(LocalDateTime.now()); // 수정 시간 업데이트
 
         // 수정된 게시글을 DB에 저장
-        postMapper.updatePost(postId, postDto.getTitle(), postDto.getContent(), existingPost.getUpdateAt());
+        postMapper.updatePost(postId, postDto.getTitle(), postDto.getContent()); // 수정된 시간은 DB에서 NOW()로 처리하므로 필요 없음
 
-        return true; // 성공 시 true 반환
+        return existingPost; // 수정된 게시글 객체 반환
     }
+
+
     
     // 게시물 ID로 조회
     public Post getPostById(Long postId) {
