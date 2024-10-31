@@ -21,10 +21,15 @@ public class PostService {
     // 게시물 작성
     public void createPost(Post post) {
         logger.info("Creating a new post with title: {} by userName: {} and boardId: {}", post.getTitle(), post.getUserName(), post.getBoardId());
+
+        // 파일 경로 로그 추가
+        if (post.getFilePath() != null) {
+            logger.info("File path for the post: {}", post.getFilePath());
+        }
+
         postMapper.insertPost(post);
         logger.info("Post created successfully with Post_ID: {}", post.getPostId());
     }
-
     // 게시물 목록 가져오기
     public List<Post> getAllPosts() {
         logger.info("Fetching all posts");

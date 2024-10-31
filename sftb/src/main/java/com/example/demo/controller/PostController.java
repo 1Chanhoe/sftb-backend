@@ -1,44 +1,64 @@
 package com.example.demo.controller;
 
 import com.example.demo.entity.Post;
-
 import com.example.demo.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import com.example.demo.dto.PostRequest;
 import com.example.demo.dto.PostDto;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
-
-import java.util.Map; // Map 클래스 import 추가
-import java.util.HashMap;  // 추가된 부분
-
+import java.util.Map;
+import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/posts")
 public class PostController {
-	
-    private static final Logger logger = LoggerFactory.getLogger(PostController.class); // Logger 초기화
+    
+    private static final Logger logger = LoggerFactory.getLogger(PostController.class);
 
     @Autowired
     private PostService postService;
 
     // 게시물 작성
     @PostMapping
-    public ResponseEntity<?> createPost(@RequestBody PostRequest postRequest) {
+    public ResponseEntity<?> createPost(
+        @RequestParam("title") String title,
+        @RequestParam("content") String content,
+        @RequestParam("userName") String userName,
+        @RequestParam("boardId") Integer boardId,
+        @RequestParam(value = "file", required = false) MultipartFile file // 파일 받기
+    ) {
         Post post = new Post();
-        post.setTitle(postRequest.getTitle());
-        post.setUserName(postRequest.getUserName()); // Member_ID를 userName으로 사용
-        post.setContent(postRequest.getContent());
-        post.setBoardId(postRequest.getBoardId()); // boardId 설정
-        post.setViewCount(0); // 초기 조회수 설정
+        post.setTitle(title);
+        post.setUserName(userName);
+        post.setContent(content);
+        post.setBoardId(boardId);
+        post.setViewCount(0);
+
+        // 파일이 있는 경우 저장
+        if (file != null && !file.isEmpty()) {
+            try {
+                String fileName = file.getOriginalFilename();
+                Path filePath = Paths.get("uploads/" + fileName);
+                Files.copy(file.getInputStream(), filePath);
+
+                // 파일 경로 설정
+                post.setFilePath(filePath.toString());
+            } catch (Exception e) {
+                e.printStackTrace();
+                return ResponseEntity.status(500).body("파일 업로드에 실패했습니다.");
+            }
+        }
 
         postService.createPost(post);
-
         return ResponseEntity.ok(post);
     }
 

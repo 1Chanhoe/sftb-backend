@@ -174,6 +174,16 @@ public class UserService {
         }
     }
     
+    public int getTierExperience(String userID) {
+        Integer tierExperience = userMapper.getTierExperience(userID);
+        if (tierExperience != null) {
+            return tierExperience;
+        } else {
+            logger.warn("Tier experience not found for userID: {}", userID);
+            throw new RuntimeException("Tier experience not found for user");
+        }
+    }
+    
     
 
 }

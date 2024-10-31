@@ -7,34 +7,47 @@ import java.time.LocalDateTime;
 @Table(name = "post") // 테이블 이름을 'post'로 지정
 public class Post {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // 기본 키 자동 생성
-    @Column(name = "Post_ID") // DB 테이블의 컬럼명과 매핑
-    private Long postId; // 게시물 고유 번호
+	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "Post_ID")
+    private Long postId;
 
-    @Column(name = "Title", nullable = false, length = 100) // 제목 필드
-    private String title; // 게시물 제목
+    @Column(name = "Title", nullable = false, length = 100)
+    private String title;
 
-    @Column(name = "Member_ID", nullable = false, length = 20) // 작성자 ID
-    private String userName; // 작성자의 회원 ID (로그인된 사용자)
+    @Column(name = "Member_ID", nullable = false, length = 20)
+    private String userName;
 
-    @Column(name = "Content", nullable = false, columnDefinition = "TEXT") // 내용 필드
-    private String content; // 게시물 내용
+    @Column(name = "Content", nullable = false, columnDefinition = "TEXT")
+    private String content;
 
-    @Column(name = "ViewCount") // 조회수 필드 (초기값 0)
-    private int viewCount = 0; // 조회수
+    @Column(name = "ViewCount")
+    private int viewCount = 0;
     
     @Column(name = "Heart")
-    private int heart = 0; // 좋아요 수 기본값
+    private int heart = 0;
 
-    @Column(name = "Create_At", nullable = false) // 작성 시간 필드
-    private LocalDateTime createAt; // 작성 시간
+    @Column(name = "Create_At", nullable = false)
+    private LocalDateTime createAt;
 
-    @Column(name = "Update_At") // 수정 시간 필드 (NULL 가능)
-    private LocalDateTime updateAt; // 수정 시간
+    @Column(name = "Update_At")
+    private LocalDateTime updateAt;
 
-    @Column(name = "Board_ID", nullable = false) // 게시판 ID 필드 (NOT NULL)
-    private Integer boardId; // 게시판 ID (외래키)
+    @Column(name = "Board_ID", nullable = false)
+    private Integer boardId;
+
+    // 추가된 부분: 파일 경로 필드
+    @Column(name = "file_path")
+    private String filePath;
+
+    // Getter and Setter for filePath
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
 
     // Getter and Setter for postId
     public Long getPostId() {
