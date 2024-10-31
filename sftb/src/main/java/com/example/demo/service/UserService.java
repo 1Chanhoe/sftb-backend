@@ -174,6 +174,7 @@ public class UserService {
         // 새로운 유저 레벨 경험치 계산
         int newLevelExperience = experience;
 
+
         // 유저 레벨 경험치가 100 이상일 경우 처리
         if (currentLevelExperience + newLevelExperience >= 100) {
             newLevelExperience -= 100; // 100을 초과하는 부분만 남기고 초기화
@@ -181,6 +182,7 @@ public class UserService {
         }
         userMapper.updateUserLevelExperience(userId, newLevelExperience);
     }
+
 
     // 신규 회원 상태 업데이트 메서드
     public void updateNewMemberStatus(String userID, boolean newMember) {
