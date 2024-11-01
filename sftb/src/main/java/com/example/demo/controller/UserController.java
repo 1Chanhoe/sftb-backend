@@ -162,14 +162,14 @@ public class UserController {
     
     @GetMapping("/users/{userID}/experience")
     public ResponseEntity<?> getUserExperience(@PathVariable("userID") String userID) {
-        logger.info("Fetching experience points for userID: {}", userID);
-        
         try {
             int userLevelExperience = userService.getUserLevelExperience(userID);
             int tierExperience = userService.getTierExperience(userID); // 티어 경험치 가져오기
+            int userLevel = userService.getUserLevel(userID);
             Map<String, Integer> experienceData = new HashMap<>();
             experienceData.put("userLevelExperience", userLevelExperience);
             experienceData.put("tierExperience", tierExperience);
+            experienceData.put("userLevel", userLevel);
             return ResponseEntity.ok(experienceData);
         } catch (Exception e) {
             logger.error("Failed to fetch experience points for userID: {}", userID, e);

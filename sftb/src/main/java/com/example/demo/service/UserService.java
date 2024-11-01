@@ -218,6 +218,10 @@ public class UserService {
         return userMapper.getUserTokenCount(userId);
     }
     
+    public int getUserLevel(String userId) {
+        return userMapper.getUserLevel(userId);
+    }
+    
     public List<User> getAllUsers() {
         return userMapper.findAllUsers();
     }
