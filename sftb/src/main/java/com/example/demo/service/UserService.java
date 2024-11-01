@@ -9,7 +9,7 @@ import com.example.demo.repository.UserMapper;
 import org.apache.coyote.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import java.util.List;
 @Service
 public class UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
@@ -215,7 +215,15 @@ public class UserService {
         }
     }
     
+    public int getUserTokenCount(String userId) {
+        return userMapper.getUserTokenCount(userId);
+    }
     
+    public int getUserLevel(String userId) {
+        return userMapper.getUserLevel(userId);
+    }
     
-
+    public List<User> getAllUsers() {
+        return userMapper.findAllUsers();
+    }
 }
