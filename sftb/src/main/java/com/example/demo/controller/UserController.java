@@ -200,6 +200,19 @@ public class UserController {
         userService.addTierExperience(commentRequest.getUserId(), commentRequest.getTierExperience());
         return ResponseEntity.ok("티어 경험치가 성공적으로 업데이트되었습니다.");
     }
+    
+    @GetMapping("/token")
+    public ResponseEntity<?> getUserToken(@RequestParam("userId") String userId) {
+        logger.info("Fetching token count for userID: {}", userId);
+
+        try {
+            int tokenCount = userService.getUserTokenCount(userId); // 서비스 메서드 호출
+            return ResponseEntity.ok(tokenCount);
+        } catch (Exception e) {
+            logger.error("Failed to fetch token count for userID: {}", userId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to fetch token count.");
+        }
+    }
 }
 
 

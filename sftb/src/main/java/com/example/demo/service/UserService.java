@@ -214,6 +214,9 @@ public class UserService {
         }
     }
     
+    public int getUserTokenCount(String userId) {
+        return userMapper.getUserTokenCount(userId);
+    }
     
 
 }

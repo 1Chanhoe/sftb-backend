@@ -38,8 +38,6 @@ public class PostController {
         post.setBoardId(postRequest.getBoardId()); // boardId 설정
         post.setViewCount(0); // 초기 조회수 설정
         post.setUserId(postRequest.getUserId());
-
-
         postService.createPost(post);
         return ResponseEntity.ok(post);
     }
