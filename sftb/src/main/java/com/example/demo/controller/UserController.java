@@ -16,7 +16,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
+import java.util.List;
 import com.example.demo.dto.UserExperienceUpdateRequest;
 import java.util.HashMap;
 import java.util.Map;
@@ -212,6 +212,12 @@ public class UserController {
             logger.error("Failed to fetch token count for userID: {}", userId, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to fetch token count.");
         }
+    }
+    
+    @GetMapping("/users")
+    public ResponseEntity<List<User>> getUsers() {
+        List<User> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
     }
 }
 

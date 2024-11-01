@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import com.example.demo.entity.User;
-
+import java.util.List;
 @Mapper
 public interface UserMapper {
     // 사용자 삽입
@@ -84,4 +84,8 @@ public interface UserMapper {
     //Token 조회
     @Select("SELECT Token FROM customers WHERE UserID = #{userId}")
     int getUserTokenCount(String userId);
+    
+    //모든유저 아이디,이름,티어,레벨,레벨경험치,티어경험치 내림차순으로 조회
+    @Select("SELECT UserID, UserName, Tier, UserLevel, UserLevel_Experience, Tier_Experience FROM customers ORDER BY Tier DESC, UserLevel DESC, Tier_Experience DESC, UserLevel_Experience DESC")
+    List<User> findAllUsers();
 }
