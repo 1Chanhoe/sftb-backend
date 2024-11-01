@@ -210,9 +210,11 @@ public class UserService {
             return tierExperience;
         } else {
             logger.warn("Tier experience not found for userID: {}", userID);
+            
             throw new RuntimeException("Tier experience not found for user");
         }
     }
+    
     
     
 
