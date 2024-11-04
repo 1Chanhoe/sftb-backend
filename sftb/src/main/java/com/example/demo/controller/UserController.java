@@ -200,6 +200,22 @@ public class UserController {
         userService.addTierExperience(commentRequest.getUserId(), commentRequest.getTierExperience());
         return ResponseEntity.ok("티어 경험치가 성공적으로 업데이트되었습니다.");
     }
+    
+    @GetMapping("/users/{userID}/isAdmin")
+    public ResponseEntity<Map<String, Boolean>> checkIfUserIsAdmin(@PathVariable("userID") String userID) {
+        logger.info("Checking if user is an admin for userID: {}", userID);
+
+        try {
+            boolean isAdmin = userService.isAdmin(userID); // 서비스에서 관리자 여부 확인
+            Map<String, Boolean> response = new HashMap<>();
+            response.put("isAdmin", isAdmin);
+            return ResponseEntity.ok(response); // isAdmin 값을 포함한 응답 반환
+        } catch (Exception e) {
+            logger.error("Failed to check admin status for userID: {}", userID, e);
+            return ResponseEntity.status(500)
+                    .body(Map.of("isAdmin", false)); // 실패 시 기본값 반환
+        }
+    }
 }
 
 

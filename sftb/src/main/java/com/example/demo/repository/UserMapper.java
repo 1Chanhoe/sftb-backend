@@ -80,5 +80,9 @@ public interface UserMapper {
     // Token 업데이트
     @Update("UPDATE customers SET Token = COALESCE(Token, 0) + #{amount} WHERE UserID = #{userId}")
     void updateToken(@Param("userId") String userId, @Param("amount") int amount);
+    
+ // 관리자인지 여부 확인
+    @Select("SELECT Manager FROM customers WHERE UserID = #{userID}")
+    int getManagerStatus(@Param("userID") String userID);
 
 }
