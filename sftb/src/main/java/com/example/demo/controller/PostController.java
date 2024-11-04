@@ -8,14 +8,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import com.example.demo.dto.PostRequest;
 import com.example.demo.dto.PostDto;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -27,21 +27,32 @@ public class PostController {
     @Autowired
     private PostService postService;
 
-    // 게시물 작성
+ // 게시물 작성 (사진 파일 첨부 가능)
     @PostMapping
-    public ResponseEntity<?> createPost(@RequestBody PostRequest postRequest) 
-    {
-        Post post = new Post();
-        post.setTitle(postRequest.getTitle());
-        post.setUserName(postRequest.getUserName()); // Member_ID를 userName으로 사용
-        post.setContent(postRequest.getContent());
-        post.setBoardId(postRequest.getBoardId()); // boardId 설정
-        post.setViewCount(0); // 초기 조회수 설정
-        post.setUserId(postRequest.getUserId());
+    public ResponseEntity<?> createPost( //매개변수들
+        @RequestParam("title") String title,
+        @RequestParam("content") String content,
+        @RequestParam("userName") String userName,
+        @RequestParam("boardId") Integer boardId,
+        @RequestParam("userId") String userId,
+        @RequestParam(value = "file", required = false) MultipartFile file) { // 첨부 파일을 받는 매개변수
+        
+    	 // Post 객체 생성 및 설정
+    	Post post = new Post();
+        post.setTitle(title);
+        post.setContent(content);
+        post.setUserName(userName);
+        post.setBoardId(boardId);
+        post.setUserId(userId);
+        post.setFilePath(null);
 
-
-        postService.createPost(post);
-        return ResponseEntity.ok(post);
+        try {
+        	// PostService의 createPost 메서드를 호출하여 게시물 생성
+            postService.createPost(post, file);
+            return ResponseEntity.ok(post); // 성공 시 생성된 게시물을 반환
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("게시물 작성 중 오류가 발생했습니다.");
+        }
     }
 
     // 게시물 목록 가져오기 (Board_ID로 필터링)

@@ -7,6 +7,7 @@ public class PostDto {
     private String content;
     private Long postId;
     private LocalDateTime updateAt; // 수정된 시간 추가
+    private String filePath; // 사진 파일 경로 추가
 
     // Getters and Setters
     public String getTitle() {
@@ -39,5 +40,13 @@ public class PostDto {
 
     public void setUpdateAt(LocalDateTime updateAt) { 
         this.updateAt = updateAt;
+    }
+    
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) { 
+        this.filePath = filePath;
     }
 }
