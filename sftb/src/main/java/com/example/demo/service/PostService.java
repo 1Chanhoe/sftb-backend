@@ -121,4 +121,12 @@ public class PostService {
 
         return true;
     }
+
+    public String getPostAuthorId(Long postId) {
+        // 게시글 조회
+        Post post = getPostById(postId); // 기존에 작성된 메서드 사용
+        return post.getUserId(); // 게시글 작성자 ID 반환
+    }
+    
+
 }

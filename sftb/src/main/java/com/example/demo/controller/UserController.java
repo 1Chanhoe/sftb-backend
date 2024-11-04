@@ -16,7 +16,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
+import java.util.List;
 import com.example.demo.dto.UserExperienceUpdateRequest;
 import java.util.HashMap;
 import java.util.Map;
@@ -162,14 +162,14 @@ public class UserController {
     
     @GetMapping("/users/{userID}/experience")
     public ResponseEntity<?> getUserExperience(@PathVariable("userID") String userID) {
-        logger.info("Fetching experience points for userID: {}", userID);
-        
         try {
             int userLevelExperience = userService.getUserLevelExperience(userID);
             int tierExperience = userService.getTierExperience(userID); // 티어 경험치 가져오기
+            int userLevel = userService.getUserLevel(userID);
             Map<String, Integer> experienceData = new HashMap<>();
             experienceData.put("userLevelExperience", userLevelExperience);
             experienceData.put("tierExperience", tierExperience);
+            experienceData.put("userLevel", userLevel);
             return ResponseEntity.ok(experienceData);
         } catch (Exception e) {
             logger.error("Failed to fetch experience points for userID: {}", userID, e);
@@ -199,6 +199,43 @@ public class UserController {
         // CommentRequest에서 사용자 ID와 경험치 업데이트 값을 가져옴
         userService.addTierExperience(commentRequest.getUserId(), commentRequest.getTierExperience());
         return ResponseEntity.ok("티어 경험치가 성공적으로 업데이트되었습니다.");
+    }
+    
+
+    @GetMapping("/token")
+    public ResponseEntity<?> getUserToken(@RequestParam("userId") String userId) {
+        logger.info("Fetching token count for userID: {}", userId);
+
+        try {
+            int tokenCount = userService.getUserTokenCount(userId); // 서비스 메서드 호출
+            return ResponseEntity.ok(tokenCount);
+        } catch (Exception e) {
+            logger.error("Failed to fetch token count for userID: {}", userId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to fetch token count.");
+        }
+    }
+    
+    @GetMapping("/users")
+    public ResponseEntity<List<User>> getUsers() {
+        List<User> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
+    }
+    
+    @GetMapping("/users/{userID}/isAdmin")
+    public ResponseEntity<Map<String, Boolean>> checkIfUserIsAdmin(@PathVariable("userID") String userID) {
+        logger.info("Checking if user is an admin for userID: {}", userID);
+
+        try {
+            boolean isAdmin = userService.isAdmin(userID); // 서비스에서 관리자 여부 확인
+            Map<String, Boolean> response = new HashMap<>();
+            response.put("isAdmin", isAdmin);
+            return ResponseEntity.ok(response); // isAdmin 값을 포함한 응답 반환
+        } catch (Exception e) {
+            logger.error("Failed to check admin status for userID: {}", userID, e);
+            return ResponseEntity.status(500)
+                    .body(Map.of("isAdmin", false)); // 실패 시 기본값 반환
+        }
+
     }
 }
 

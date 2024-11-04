@@ -29,6 +29,7 @@ public class PostController {
 
  // 게시물 작성 (사진 파일 첨부 가능)
     @PostMapping
+
     public ResponseEntity<?> createPost( //매개변수들
         @RequestParam("title") String title,
         @RequestParam("content") String content,
@@ -53,6 +54,7 @@ public class PostController {
         } catch (Exception e) {
             return ResponseEntity.status(500).body("게시물 작성 중 오류가 발생했습니다.");
         }
+
     }
 
     // 게시물 목록 가져오기 (Board_ID로 필터링)
