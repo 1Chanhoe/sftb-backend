@@ -20,6 +20,7 @@ public class User {
     private int userLevelExperience; // User Level 경험치
     private int token; // 성과금
     private boolean newMember;
+    private int manager;
    
     
  
@@ -112,6 +113,14 @@ public class User {
     public void setNewMember(boolean newMember) { // Setter 메서드 추가
         this.newMember = newMember;
     }
+
+	public int getManager() {
+		return manager;
+	}
+
+	public void setManager(int manager) {
+		this.manager = manager;
+	}
     
  
 

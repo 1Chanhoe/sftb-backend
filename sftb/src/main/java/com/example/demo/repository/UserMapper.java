@@ -81,6 +81,7 @@ public interface UserMapper {
     @Update("UPDATE customers SET Token = COALESCE(Token, 0) + #{amount} WHERE UserID = #{userId}")
     void updateToken(@Param("userId") String userId, @Param("amount") int amount);
     
+<<<<<<< HEAD
     //Token 조회
     @Select("SELECT Token FROM customers WHERE UserID = #{userId}")
     int getUserTokenCount(String userId);
@@ -88,4 +89,10 @@ public interface UserMapper {
     //모든유저 아이디,이름,티어,레벨,레벨경험치,티어경험치 내림차순으로 조회
     @Select("SELECT UserID, UserName, Tier, UserLevel, UserLevel_Experience, Tier_Experience FROM customers ORDER BY Tier DESC, UserLevel DESC, Tier_Experience DESC, UserLevel_Experience DESC")
     List<User> findAllUsers();
+=======
+ // 관리자인지 여부 확인
+    @Select("SELECT Manager FROM customers WHERE UserID = #{userID}")
+    int getManagerStatus(@Param("userID") String userID);
+
+>>>>>>> branch 'sungwon' of https://github.com/1Chanhoe/sftb-backend.git
 }

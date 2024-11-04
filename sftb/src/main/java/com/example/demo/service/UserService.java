@@ -214,9 +214,21 @@ public class UserService {
         }
     }
     
+
     public int getUserTokenCount(String userId) {
         return userMapper.getUserTokenCount(userId);
     }
+
+    public boolean isAdmin(String userID) {
+        logger.info("Checking if user is an admin for userID: {}", userID);
+        
+        // User 엔티티에서 userID를 기반으로 사용자 정보를 조회
+        int managerStatus = userMapper.getManagerStatus(userID);
+        
+        // managerStatus가 1이면 관리자로 반환
+        return managerStatus == 1;
+    }
+    
     
     public int getUserLevel(String userId) {
         return userMapper.getUserLevel(userId);
