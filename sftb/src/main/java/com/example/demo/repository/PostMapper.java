@@ -43,7 +43,7 @@ public interface PostMapper {
 
  // 게시글 ID로 게시글을 조회하는 메서드
     @Select("SELECT Post_ID AS postId, Title AS title, Content AS content, " +
-            "Member_ID AS memberId, Create_At AS createdAt, Update_At AS updateAt " +
+            "Member_ID AS memberId, Create_At AS createdAt, Update_At AS updateAt, UserID AS userId " +
             "FROM post WHERE Post_ID = #{postId}")
     Post findPostById(@Param("postId") Long postId);
 

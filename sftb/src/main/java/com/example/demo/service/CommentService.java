@@ -29,6 +29,11 @@ public class CommentService {
         return rootComments;
     }
     
+    // 댓글 ID로 댓글 조회
+    public Comment getCommentById(Long commentId) {
+        Comment comment = commentMapper.findCommentById(commentId);
+        return comment; // 댓글 반환
+    }
     //댓글 추가 메소드
     public void addComment(Comment comment) {
         comment.setCreatedAt(LocalDateTime.now());

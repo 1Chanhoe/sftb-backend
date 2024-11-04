@@ -5,9 +5,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.demo.service.CommentService;
+import com.example.demo.service.PostService;
+
 import java.util.List;
 import com.example.demo.entity.Comment;
 import com.example.demo.dto.CommentRequest; // DTO 클래스 임포트
+import com.example.demo.dto.CommentResponseDto;
 
 
 @RestController
@@ -17,16 +20,24 @@ public class CommentController {
     @Autowired
     private CommentService commentService;
     
+    @Autowired
+    private PostService postService; // PostService 인스턴스 주입
+    
     @GetMapping("/{postId}")
     public ResponseEntity<List<Comment>> getComments(@PathVariable("postId") Long postId) {
         List<Comment> comments = commentService.getCommentsByPostId(postId);
         return ResponseEntity.ok(comments);
     }
-
+    
+    //댓글 추가 API
     @PostMapping
-    public ResponseEntity<Void> createComment(@RequestBody CommentRequest commentRequest) {
-        commentService.addComment(commentRequest.toComment()); // DTO를 Comment로 변환
-        return ResponseEntity.ok().build();
+    public ResponseEntity<CommentResponseDto> createComment(@RequestBody CommentRequest commentRequest) {
+    	Comment comment = commentRequest.toComment();
+    	commentService.addComment(comment);
+    	// 게시글의 작성자 ID 가져오기
+        String postAuthorId = postService.getPostAuthorId(commentRequest.getPostId());
+        CommentResponseDto response = new CommentResponseDto(comment, postAuthorId);
+        return ResponseEntity.ok(response);
     }
     
     //댓글 수정 API
@@ -36,11 +47,14 @@ public class CommentController {
         return ResponseEntity.ok(updatedComment); // 수정된 댓글 객체 반환
     }
     
-    // 댓글 삭제 API
+    // 댓글 삭제 API String으로 반환하는이유는 간단한 게시글작성자ID만 필요하고 추가적인 정보는 필요하지않으므로 String이 적절하다
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<Void> deleteComment(@PathVariable("commentId") Long commentId) {
+    public ResponseEntity<String> deleteComment(@PathVariable("commentId") Long commentId) {
+    	Comment comment = commentService.getCommentById(commentId);
+    	String postAuthorId = postService.getPostAuthorId(comment.getPostId()); // 댓글에 대한 게시글 ID가 필요합니다.
+        
         commentService.deleteComment(commentId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(postAuthorId);
     }
     
     // 대댓글 수정 API
@@ -52,9 +66,11 @@ public class CommentController {
 
     // 대댓글 삭제 API
     @DeleteMapping("/replies/{replyId}")
-    public ResponseEntity<Void> deleteReply(@PathVariable("replyId") Long replyId) {
+    public ResponseEntity<String> deleteReply(@PathVariable("replyId") Long replyId) {
+    	Comment replyComment = commentService.getCommentById(replyId);
+    	String postAuthorId = postService.getPostAuthorId(replyComment.getPostId());
         commentService.deleteComment(replyId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(postAuthorId);
     }
     
     //댓글 채택시 경험치 추가 API
