@@ -41,11 +41,12 @@ public class Post {
     private String filePath;
 
     // Getter and Setter for filePath
- 
-
-    
+   
     @Column(name = "UserID")
     private String userId;
+    
+    @Column(name = "Adopt")
+    private boolean adopt;
 
 
     // Getter and Setter for postId
@@ -153,5 +154,13 @@ public class Post {
 
     public void setFilePath(String filePath) {
         this.filePath = filePath;
+    }
+    
+    public boolean getAdopt() {
+        return adopt;
+    }
+
+    public void setAdopt(boolean adopt) {
+        this.adopt = adopt;
     }
 }

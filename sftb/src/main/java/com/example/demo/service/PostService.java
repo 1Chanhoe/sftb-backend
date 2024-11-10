@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.example.demo.service.UserService;
 import com.example.demo.entity.Post;
 import com.example.demo.repository.PostMapper;
 import com.example.demo.dto.PostDto;
@@ -21,21 +22,12 @@ public class PostService {
 
     @Autowired
     private PostMapper postMapper;
+    
+    @Autowired
+    private UserService userService;
 
     // 게시물 작성 (파일 업로드 추가)
-    public void createPost(Post post, MultipartFile file) throws Exception {
-        logger.info("Creating a new post with title: {} by userName: {} and boardId: {}", post.getTitle(), post.getUserName(), post.getBoardId());
-
-        // 파일이 있는 경우 처리
-        if (file != null && !file.isEmpty()) {
-            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            Path filePath = Paths.get("uploads/" + fileName);
-            Files.createDirectories(filePath.getParent()); // 디렉토리 생성
-            Files.write(filePath, file.getBytes()); // 파일 저장
-            post.setFilePath(filePath.toString()); // 파일 경로 설정
-            logger.info("File saved at: {}", filePath.toString());
-        }
-
+    public void createPost(Post post) {
         postMapper.insertPost(post);
         logger.info("Post created successfully with Post_ID: {}", post.getPostId());
     }
@@ -127,6 +119,25 @@ public class PostService {
         Post post = getPostById(postId); // 기존에 작성된 메서드 사용
         return post.getUserId(); // 게시글 작성자 ID 반환
     }
+    
+    // 관리자 채택 관련
+    public Post adoptPost(Long postId) {
+       
+        Post post = postMapper.findPostById(postId);
+        
+        // 게시글이 존재하지 않으면 예외 처리
+        if (post == null) {
+            throw new IllegalArgumentException("Post not found.");
+        }
+        
+        post.setAdopt(true);
+
+        // 게시글 채택 상태로 업데이트
+        postMapper.updateAdoptPostStatus(postId);
+        return post;
+    }
+
+
     
 
 }

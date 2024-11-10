@@ -16,7 +16,7 @@ public interface PostMapper {
  // 게시물 목록 조회
     @Select("SELECT Post_ID AS postId, Title AS title, Member_ID AS userName, Content AS content, " +
             "ViewCount AS viewCount, Create_At AS createAt, Update_At AS updateAt, " +
-            "Board_ID AS boardId, Heart AS heart, file_path AS filePath " +
+            "Board_ID AS boardId, Heart AS heart, file_path AS filePath, UserID AS userId" +
             "FROM post ORDER BY Create_At DESC")
     List<Post> findAllPosts();
 
@@ -26,7 +26,7 @@ public interface PostMapper {
 
  // 게시글 ID로 게시글을 조회하는 메서드
     @Select("SELECT Post_ID AS postId, Title AS title, Content AS content, " +
-            "Member_ID AS memberId, Create_At AS createdAt, Update_At AS updateAt, UserID AS userId " +
+            "Member_ID AS memberId, Create_At AS createdAt, Update_At AS updateAt, UserID AS userId, Adopt AS adopt " +
             "FROM post WHERE Post_ID = #{postId}")
     Post findPostById(@Param("postId") Long postId);
 
@@ -37,7 +37,7 @@ public interface PostMapper {
  // 특정 Board_ID에 따른 게시물 조회
     @Select("SELECT Post_ID AS postId, Title AS title, Member_ID AS userName, Content AS content, " +
             "ViewCount AS viewCount, Create_At AS createAt, Update_At AS updateAt, " +
-            "Board_ID AS boardId, Heart AS heart " +
+            "Board_ID AS boardId, Heart AS heart, UserID AS userId " +
             "FROM post WHERE Board_ID = #{boardId} ORDER BY Create_At DESC")
     List<Post> findPostsByBoardId(int boardId);
     
@@ -52,4 +52,10 @@ public interface PostMapper {
     // 하트 갯수 가져오기
     @Select("SELECT Heart FROM post WHERE Post_ID = #{postId}")
     int findHeartCountByPostId(@Param("postId") Long postId);
+    
+ // 게시글 채택 상태 업데이트
+    @Update("UPDATE post SET Adopt = true WHERE Post_ID = #{postId}")
+    void updateAdoptPostStatus(@Param("postId") Long postId);
+
+
 }
