@@ -23,19 +23,7 @@ public class PostService {
     private PostMapper postMapper;
 
     // 게시물 작성 (파일 업로드 추가)
-    public void createPost(Post post, MultipartFile file) throws Exception {
-        logger.info("Creating a new post with title: {} by userName: {} and boardId: {}", post.getTitle(), post.getUserName(), post.getBoardId());
-
-        // 파일이 있는 경우 처리
-        if (file != null && !file.isEmpty()) {
-            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            Path filePath = Paths.get("uploads/" + fileName);
-            Files.createDirectories(filePath.getParent()); // 디렉토리 생성
-            Files.write(filePath, file.getBytes()); // 파일 저장
-            post.setFilePath(filePath.toString()); // 파일 경로 설정
-            logger.info("File saved at: {}", filePath.toString());
-        }
-
+    public void createPost(Post post) {
         postMapper.insertPost(post);
         logger.info("Post created successfully with Post_ID: {}", post.getPostId());
     }

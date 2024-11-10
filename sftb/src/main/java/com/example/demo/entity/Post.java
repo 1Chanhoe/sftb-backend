@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 @Table(name = "post") // 테이블 이름을 'post'로 지정
 public class Post {
 
-	@Id
+   @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Post_ID")
     private Long postId;
@@ -41,11 +41,12 @@ public class Post {
     private String filePath;
 
     // Getter and Setter for filePath
- 
-
-    
+   
     @Column(name = "UserID")
     private String userId;
+    
+    @Column(name = "Adopt")
+    private boolean adopt;
 
 
     // Getter and Setter for postId
@@ -128,12 +129,12 @@ public class Post {
     }
     
     public String getUserId() {
-		return userId;
-	}
+      return userId;
+   }
 
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
+   public void setUserId(String userId) {
+      this.userId = userId;
+   }
 
     // 생성된 시점에 기본적으로 작성 시간을 현재 시간으로 설정
     @PrePersist
@@ -153,5 +154,13 @@ public class Post {
 
     public void setFilePath(String filePath) {
         this.filePath = filePath;
+    }
+    
+    public boolean getAdopt() {
+        return adopt;
+    }
+
+    public void setAdopt(boolean adopt) {
+        this.adopt = adopt;
     }
 }

@@ -16,7 +16,7 @@ public interface PostMapper {
  // 게시물 목록 조회
     @Select("SELECT Post_ID AS postId, Title AS title, Member_ID AS userName, Content AS content, " +
             "ViewCount AS viewCount, Create_At AS createAt, Update_At AS updateAt, " +
-            "Board_ID AS boardId, Heart AS heart, file_path AS filePath " +
+            "Board_ID AS boardId, Heart AS heart, file_path AS filePath , UserID AS userId" +
             "FROM post ORDER BY Create_At DESC")
     List<Post> findAllPosts();
 
@@ -37,7 +37,7 @@ public interface PostMapper {
  // 특정 Board_ID에 따른 게시물 조회
     @Select("SELECT Post_ID AS postId, Title AS title, Member_ID AS userName, Content AS content, " +
             "ViewCount AS viewCount, Create_At AS createAt, Update_At AS updateAt, " +
-            "Board_ID AS boardId, Heart AS heart " +
+            "Board_ID AS boardId, Heart AS heart ,  UserID AS userId " +
             "FROM post WHERE Board_ID = #{boardId} ORDER BY Create_At DESC")
     List<Post> findPostsByBoardId(int boardId);
     
