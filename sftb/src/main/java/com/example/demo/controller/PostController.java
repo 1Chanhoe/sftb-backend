@@ -30,8 +30,6 @@ public class PostController {
 
  // 게시물 작성 (사진 파일 첨부 가능)
     @PostMapping
-
-
     public ResponseEntity<?> createPost(@RequestBody PostRequest postRequest) 
     {
         Post post = new Post();
@@ -76,7 +74,6 @@ public class PostController {
         return ResponseEntity.ok().build(); // 성공 응답 반환
     }
     
-
    
     // 게시글 수정 API
     @PutMapping("/{postId}")
