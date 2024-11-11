@@ -1,5 +1,7 @@
 package com.example.demo.dto;
 
+import com.example.demo.entity.Post;
+
 public class PostRequest {
     private String title;
     private String userName; // 변경된 필드 이름
@@ -45,6 +47,7 @@ public class PostRequest {
         return userId;
     }
 
+
     public void setUserId(String userId) {
         this.userId = userId;
     }
@@ -55,5 +58,19 @@ public class PostRequest {
 
     public void setTierExperience(int tierExperience) {
         this.tierExperience = tierExperience;
+        }
+
+	
+	// Post 객체로 변환하는 메서드
+    public Post toPost() {
+        Post post = new Post();
+        post.setTitle(this.title);
+        post.setUserName(this.userName);
+        post.setContent(this.content);
+        post.setBoardId(this.boardId);
+        post.setViewCount(0); // 초기 조회수 설정
+        post.setUserId(this.userId);
+        return post;
+
     }
 }

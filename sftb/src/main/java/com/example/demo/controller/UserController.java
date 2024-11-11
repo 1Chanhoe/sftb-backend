@@ -166,10 +166,12 @@ public class UserController {
             int userLevelExperience = userService.getUserLevelExperience(userID);
             int tierExperience = userService.getTierExperience(userID); // 티어 경험치 가져오기
             int userLevel = userService.getUserLevel(userID);
-            Map<String, Integer> experienceData = new HashMap<>();
+            String userTier = userService.getUserTier(userID);
+            Map<String, Object> experienceData = new HashMap<>();
             experienceData.put("userLevelExperience", userLevelExperience);
             experienceData.put("tierExperience", tierExperience);
             experienceData.put("userLevel", userLevel);
+            experienceData.put("userTier", userTier);
             return ResponseEntity.ok(experienceData);
         } catch (Exception e) {
             logger.error("Failed to fetch experience points for userID: {}", userID, e);

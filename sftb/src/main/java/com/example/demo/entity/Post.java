@@ -41,7 +41,7 @@ public class Post {
     private String filePath;
 
     // Getter and Setter for filePath
-   
+
     @Column(name = "UserID")
     private String userId;
     

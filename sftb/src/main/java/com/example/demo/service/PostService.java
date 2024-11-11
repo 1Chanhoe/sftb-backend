@@ -26,10 +26,10 @@ public class PostService {
     @Autowired
     private UserService userService;
 
+
     // 게시물 작성 (파일 업로드 추가)
     public void createPost(Post post) {
         postMapper.insertPost(post);
-        logger.info("Post created successfully with Post_ID: {}", post.getPostId());
     }
 
     // 게시물 목록 가져오기
@@ -58,11 +58,6 @@ public class PostService {
     // 하트 수 감소
     public void decrementHeartCount(Long postId) {
         postMapper.decrementHeartCount(postId);
-    }
-
-    // 하트 갯수 가져오기
-    public int getHeartCount(Long postId) {
-        return postMapper.findHeartCountByPostId(postId);
     }
 
     // 게시물 수정
@@ -113,12 +108,15 @@ public class PostService {
     }
 
 
+    //게시글 작성자 조회하기
+
     public String getPostAuthorId(Long postId) {
         // 게시글 조회
         Post post = getPostById(postId); // 기존에 작성된 메서드 사용
         return post.getUserId(); // 게시글 작성자 ID 반환
     }
     
+
  // 관리자 채택 관련
     public Post adoptPost(Long postId, String userId, int tierExperience) {
         // 게시물 조회
@@ -142,5 +140,11 @@ public class PostService {
  
 
     
+
+    // 조회수 증가
+    public void incrementViewCount(Long postId) {
+        postMapper.incrementViewCount(postId);
+    }
+
 
 }

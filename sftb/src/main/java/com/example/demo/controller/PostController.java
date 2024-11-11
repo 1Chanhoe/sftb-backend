@@ -31,6 +31,7 @@ public class PostController {
  // 게시물 작성 (사진 파일 첨부 가능)
     @PostMapping
 
+
     public ResponseEntity<?> createPost(@RequestBody PostRequest postRequest) 
     {
         Post post = new Post();
@@ -43,8 +44,8 @@ public class PostController {
         postService.createPost(post);
         return ResponseEntity.ok(post);
 
-    }
 
+    }
     // 게시물 목록 가져오기 (Board_ID로 필터링)
     @GetMapping
     public ResponseEntity<List<Post>> getPostsByBoardId(@RequestParam(value = "boardId", required = false) Integer boardId) {
@@ -59,7 +60,7 @@ public class PostController {
         return ResponseEntity.ok(posts);
     }
 
- // 게시물 하트 수 증가/감소
+    // 게시물 하트 수 증가/감소
     @PostMapping("/{postId}/hearts")
     public ResponseEntity<?> updateHeartCount(@PathVariable("postId") Long postId, @RequestBody Map<String, Boolean> requestBody) {
         Boolean heart = requestBody.get("heart"); // 클라이언트에서 보낸 하트 상태
@@ -74,17 +75,10 @@ public class PostController {
 
         return ResponseEntity.ok().build(); // 성공 응답 반환
     }
- // 게시물 하트 수 조회
-    @GetMapping("/{postId}/hearts")
-    public ResponseEntity<Map<String, Integer>> getHeartCount(@PathVariable("postId") Long postId) {
-        int heartCount = postService.getHeartCount(postId); // 서비스에서 하트 수 조회
-        Map<String, Integer> response = new HashMap<>();
-        response.put("heartCount", heartCount);
-        return ResponseEntity.ok(response);
-    }
-
     
- // 게시글 수정 API
+
+   
+    // 게시글 수정 API
     @PutMapping("/{postId}")
     public ResponseEntity<Post> updatePost(
         @PathVariable("postId") Long postId,
@@ -116,6 +110,7 @@ public class PostController {
     }
     
 
+
   //특정 게시물의 세부사항 가져오기
     @GetMapping("/{postId}")
     public ResponseEntity<Post> getPostById(@PathVariable("postId") Long postId) {
@@ -136,5 +131,12 @@ public class PostController {
     }
 
 
+
+
+    // 조회수 증가
+    @PostMapping("/{postId}/incrementViewCount")
+    public void incrementViewCount(@PathVariable("postId") Long postId) {
+        postService.incrementViewCount(postId);
+    }
 
 }
