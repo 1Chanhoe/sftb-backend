@@ -21,7 +21,7 @@ public class Comment {
     private Long postId;        // 게시글 ID (Post_ID)
     private String userId;
     private List<Comment> replies; // 대댓글 목록
-    
+    private String authorTier;
     // Getters and Setters
     public Long getCommentId() {
         return commentId;
@@ -110,4 +110,12 @@ public class Comment {
     public void setReplies(List<Comment> replies) {
         this.replies = replies;
     }
+
+	public String getAuthorTier() {
+		return authorTier;
+	}
+
+	public void setAuthorTier(String authorTier) {
+		this.authorTier = authorTier;
+	}
 }

@@ -25,7 +25,17 @@ public class CommentService {
         for (Comment comment : rootComments) {
             List<Comment> replies = commentMapper.findRepliesByParentId(postId, comment.getCommentId());
             comment.setReplies(replies);
+            String authorId = comment.getUserId();
+            String authorTier = userService.getUserTier(authorId);
+            comment.setAuthorTier(authorTier);
+            
+            for (Comment reply : replies) {
+                String replyAuthorId = reply.getUserId(); // 대댓글의 작성자 ID
+                String replyAuthorTier = userService.getUserTier(replyAuthorId); // 사용자 티어 가져오기
+                reply.setAuthorTier(replyAuthorTier); // 대댓글에 티어 설정
+            }
         }
+        
         return rootComments;
     }
     

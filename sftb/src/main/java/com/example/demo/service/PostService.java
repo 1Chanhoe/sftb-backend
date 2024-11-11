@@ -3,6 +3,7 @@ package com.example.demo.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import com.example.demo.service.UserService;
 import com.example.demo.entity.Post;
 import com.example.demo.repository.PostMapper;
 import com.example.demo.dto.PostDto;
@@ -25,12 +26,18 @@ public class PostService {
     private PostMapper postMapper;
     
     @Autowired
+
     private FileService fileService;
     
     @Value("${file.upload-dir}")
     private String uploadDir; // 업로드 디렉토리 설정 값
 
+    private UserService userService;
+
+
+
     // 게시물 작성 (파일 업로드 추가)
+
     public void createPost(Post post, MultipartFile file) throws Exception {
         logger.info("Creating a new post with title: {} by userName: {} and boardId: {}", post.getTitle(), post.getUserName(), post.getBoardId());
 
@@ -43,12 +50,15 @@ public class PostService {
             } catch (IOException e) {
                 logger.error("File saving failed", e);
                 throw new Exception("File saving failed", e);
-            }
+            	}
+        	}
         }
 
         // 게시물 정보 저장
+
+    public void createPost(Post post) {
+
         postMapper.insertPost(post);
-        logger.info("Post created successfully with Post_ID: {}", post.getPostId());
     }
 
     // 게시물 목록 가져오기
@@ -77,11 +87,6 @@ public class PostService {
     // 하트 수 감소
     public void decrementHeartCount(Long postId) {
         postMapper.decrementHeartCount(postId);
-    }
-
-    // 하트 갯수 가져오기
-    public int getHeartCount(Long postId) {
-        return postMapper.findHeartCountByPostId(postId);
     }
 
     // 게시물 수정
@@ -118,23 +123,24 @@ public class PostService {
         }
         return post;
     }
-
-    // 게시물 삭제
-    public boolean deletePost(Long postId) {
-        logger.info("Deleting post with ID: {}", postId);
-
+    // 게시글 삭제
+    public Post deletePost(Long postId) {
         // 해당 ID의 게시글을 찾음
         Post existingPost = postMapper.findPostById(postId);
         if (existingPost == null) {
-            throw new IllegalArgumentException("게시물이 존재하지 않습니다.");
+            throw new IllegalArgumentException("게시물이 존재하지 않습니다."); // 게시물이 없으면 예외 발생
         }
 
-        // 게시물 삭제
+       
         postMapper.deletePost(postId);
         logger.info("Post with ID: {} deleted successfully", postId);
 
-        return true;
+        // 삭제된 게시물 객체 반환
+        return existingPost;
     }
+
+
+    //게시글 작성자 조회하기
 
     public String getPostAuthorId(Long postId) {
         // 게시글 조회
@@ -143,5 +149,35 @@ public class PostService {
     }
     
     
+
+ // 관리자 채택 관련
+    public Post adoptPost(Long postId, String userId, int tierExperience) {
+        // 게시물 조회
+        Post post = postMapper.findPostById(postId);
+
+        // 게시글이 존재하지 않으면 예외 처리
+        if (post == null) {
+            throw new IllegalArgumentException("Post not found.");
+        }
+
+        // 티어 경험치 부여
+        userService.addTierExperience(userId, tierExperience); // 받은 티어 경험치로 업데이트
+
+        // 게시물 채택 상태 업데이트
+        post.setAdopt(true); // Adopt 상태 변경
+        postMapper.updateAdoptPostStatus(postId); // Adopt 상태 업데이트
+
+        return post; // 업데이트된 게시물 정보를 반환
+    }
+
+ 
+
+    
+
+    // 조회수 증가
+    public void incrementViewCount(Long postId) {
+        postMapper.incrementViewCount(postId);
+    }
+
 
 }
