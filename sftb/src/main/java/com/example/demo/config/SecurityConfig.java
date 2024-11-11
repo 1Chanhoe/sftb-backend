@@ -42,10 +42,14 @@ public class SecurityConfig {
                     .requestMatchers("/api/auth/**").permitAll()
                     .requestMatchers("/api/posts").permitAll()
                     .requestMatchers("/api/posts/**").permitAll()
+                    .requestMatchers("/api/files").permitAll()
+                    .requestMatchers("/api/files/**").permitAll()
                     .requestMatchers("/api/comments").permitAll()
                     .requestMatchers("/api/comments/**").permitAll()
                     .requestMatchers("/api/comments/replies").permitAll()
                     .requestMatchers("/api/comments/replies/**").permitAll()
+                    .requestMatchers("/uploads/**").permitAll() 
+                    
                     
 
 

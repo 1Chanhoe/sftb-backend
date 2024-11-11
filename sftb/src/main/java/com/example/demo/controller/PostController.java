@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.entity.Post;
+import com.example.demo.service.FileService;
 import com.example.demo.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,9 @@ public class PostController {
 
     @Autowired
     private PostService postService;
+    
+    @Autowired
+    private FileService fileService;
 
  // 게시물 작성 (사진 파일 첨부 가능)
     @PostMapping
@@ -45,9 +49,16 @@ public class PostController {
         post.setUserName(userName);
         post.setBoardId(boardId);
         post.setUserId(userId);
-        post.setFilePath(null);
 
         try {
+        	// 파일이 존재하는 경우에만 파일 저장
+        	if (file != null && !file.isEmpty()) {
+        		
+        		String filePath = fileService.saveFile(file); // 파일 저장
+                post.setFilePath(filePath); // 저장된 파일 경로를 설정
+                }
+            
+            
         	// PostService의 createPost 메서드를 호출하여 게시물 생성
             postService.createPost(post, file);
             return ResponseEntity.ok(post); // 성공 시 생성된 게시물을 반환
