@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.springframework.http.HttpStatus;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -98,22 +99,42 @@ public class PostController {
             return ResponseEntity.status(404).body(null); // 게시글이 존재하지 않음
         }
     }
-
-
-
-    // 게시물 삭제
+    
+ // 게시물 삭제
     @DeleteMapping("/{postId}")
     public ResponseEntity<?> deletePost(@PathVariable("postId") Long postId) {
         logger.info("Received delete request for postId: {}", postId);
         
-        boolean isDeleted = postService.deletePost(postId);
+        // 삭제된 게시물 객체를 반환하도록 수정
+        Post deletedPost = postService.deletePost(postId);
         
-        if (isDeleted) {
-            return ResponseEntity.ok("게시물이 삭제되었습니다."); // 삭제 성공 메시지 반환
+        if (deletedPost != null) {
+            return ResponseEntity.ok(deletedPost); // 삭제된 게시물 반환
         } else {
             return ResponseEntity.status(404).body("게시물을 찾을 수 없습니다."); // 삭제 실패 메시지
         }
     }
     
+
+  //특정 게시물의 세부사항 가져오기
+    @GetMapping("/{postId}")
+    public ResponseEntity<Post> getPostById(@PathVariable("postId") Long postId) {
+        Post post = postService.getPostById(postId);
+        return ResponseEntity.ok(post);
+    }
+    
+ // 게시물 채택
+    @PutMapping("/{postId}/adopt")
+    public ResponseEntity<Post> adoptPost(@PathVariable("postId") Long postId, @RequestBody PostRequest postRequest) { 
+        try {
+            // 게시물 채택 처리 및 업데이트된 게시물 정보 가져오기
+            Post updatedPost = postService.adoptPost(postId, postRequest.getUserId(), postRequest.getTierExperience());
+            return ResponseEntity.ok(updatedPost); // 업데이트된 게시물 정보를 반환
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // 오류 발생 시 null 반환
+        }
+    }
+
+
 
 }

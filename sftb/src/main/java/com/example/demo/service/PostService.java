@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.example.demo.service.UserService;
 import com.example.demo.entity.Post;
 import com.example.demo.repository.PostMapper;
 import com.example.demo.dto.PostDto;
@@ -21,6 +22,9 @@ public class PostService {
 
     @Autowired
     private PostMapper postMapper;
+    
+    @Autowired
+    private UserService userService;
 
     // 게시물 작성 (파일 업로드 추가)
     public void createPost(Post post) {
@@ -92,29 +96,51 @@ public class PostService {
         }
         return post;
     }
-
-    // 게시물 삭제
-    public boolean deletePost(Long postId) {
-        logger.info("Deleting post with ID: {}", postId);
-
+    // 게시글 삭제
+    public Post deletePost(Long postId) {
         // 해당 ID의 게시글을 찾음
         Post existingPost = postMapper.findPostById(postId);
         if (existingPost == null) {
-            throw new IllegalArgumentException("게시물이 존재하지 않습니다.");
+            throw new IllegalArgumentException("게시물이 존재하지 않습니다."); // 게시물이 없으면 예외 발생
         }
 
-        // 게시물 삭제
+       
         postMapper.deletePost(postId);
         logger.info("Post with ID: {} deleted successfully", postId);
 
-        return true;
+        // 삭제된 게시물 객체 반환
+        return existingPost;
     }
+
 
     public String getPostAuthorId(Long postId) {
         // 게시글 조회
         Post post = getPostById(postId); // 기존에 작성된 메서드 사용
         return post.getUserId(); // 게시글 작성자 ID 반환
     }
+    
+ // 관리자 채택 관련
+    public Post adoptPost(Long postId, String userId, int tierExperience) {
+        // 게시물 조회
+        Post post = postMapper.findPostById(postId);
+
+        // 게시글이 존재하지 않으면 예외 처리
+        if (post == null) {
+            throw new IllegalArgumentException("Post not found.");
+        }
+
+        // 티어 경험치 부여
+        userService.addTierExperience(userId, tierExperience); // 받은 티어 경험치로 업데이트
+
+        // 게시물 채택 상태 업데이트
+        post.setAdopt(true); // Adopt 상태 변경
+        postMapper.updateAdoptPostStatus(postId); // Adopt 상태 업데이트
+
+        return post; // 업데이트된 게시물 정보를 반환
+    }
+
+ 
+
     
 
 }

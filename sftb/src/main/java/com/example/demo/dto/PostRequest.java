@@ -5,7 +5,8 @@ public class PostRequest {
     private String userName; // 변경된 필드 이름
     private String content;
     private int boardId; // 게시판 ID 추가
-    private String userId; 
+    private String userId;
+    private int tierExperience; // 티어 경험치 추가
 
     // Getters and Setters
     public String getTitle() {
@@ -33,18 +34,26 @@ public class PostRequest {
     }
 
     public int getBoardId() {
-        return boardId; // 게시판 ID Getter
+        return boardId;
     }
 
     public void setBoardId(int boardId) {
-        this.boardId = boardId; // 게시판 ID Setter
+        this.boardId = boardId;
     }
 
-	public String getUserId() {
-		return userId;
-	}
+    public String getUserId() {
+        return userId;
+    }
 
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public int getTierExperience() {
+        return tierExperience;
+    }
+
+    public void setTierExperience(int tierExperience) {
+        this.tierExperience = tierExperience;
+    }
 }
