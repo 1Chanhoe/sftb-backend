@@ -29,34 +29,12 @@ public class PostController {
 
  // 게시물 작성 (사진 파일 첨부 가능)
     @PostMapping
-
-    public ResponseEntity<?> createPost( //매개변수들
-        @RequestParam("title") String title,
-        @RequestParam("content") String content,
-        @RequestParam("userName") String userName,
-        @RequestParam("boardId") Integer boardId,
-        @RequestParam("userId") String userId,
-        @RequestParam(value = "file", required = false) MultipartFile file) { // 첨부 파일을 받는 매개변수
-        
-    	 // Post 객체 생성 및 설정
-    	Post post = new Post();
-        post.setTitle(title);
-        post.setContent(content);
-        post.setUserName(userName);
-        post.setBoardId(boardId);
-        post.setUserId(userId);
-        post.setFilePath(null);
-
-        try {
-        	// PostService의 createPost 메서드를 호출하여 게시물 생성
-            postService.createPost(post, file);
-            return ResponseEntity.ok(post); // 성공 시 생성된 게시물을 반환
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("게시물 작성 중 오류가 발생했습니다.");
-        }
-
+    public ResponseEntity<?> createPost(@RequestBody PostRequest postRequest) 
+    {
+    	Post post = postRequest.toPost();
+        postService.createPost(post);
+        return ResponseEntity.ok(post);
     }
-
     // 게시물 목록 가져오기 (Board_ID로 필터링)
     @GetMapping
     public ResponseEntity<List<Post>> getPostsByBoardId(@RequestParam(value = "boardId", required = false) Integer boardId) {
@@ -71,7 +49,7 @@ public class PostController {
         return ResponseEntity.ok(posts);
     }
 
- // 게시물 하트 수 증가/감소
+    // 게시물 하트 수 증가/감소
     @PostMapping("/{postId}/hearts")
     public ResponseEntity<?> updateHeartCount(@PathVariable("postId") Long postId, @RequestBody Map<String, Boolean> requestBody) {
         Boolean heart = requestBody.get("heart"); // 클라이언트에서 보낸 하트 상태
@@ -86,17 +64,15 @@ public class PostController {
 
         return ResponseEntity.ok().build(); // 성공 응답 반환
     }
- // 게시물 하트 수 조회
-    @GetMapping("/{postId}/hearts")
-    public ResponseEntity<Map<String, Integer>> getHeartCount(@PathVariable("postId") Long postId) {
-        int heartCount = postService.getHeartCount(postId); // 서비스에서 하트 수 조회
-        Map<String, Integer> response = new HashMap<>();
-        response.put("heartCount", heartCount);
-        return ResponseEntity.ok(response);
-    }
-
     
- // 게시글 수정 API
+    //특정 게시물의 세부사항 가져오기
+    @GetMapping("/{postId}")
+    public ResponseEntity<Post> getPostById(@PathVariable("postId") Long postId) {
+        Post post = postService.getPostById(postId);
+        return ResponseEntity.ok(post);
+    }
+    
+    // 게시글 수정 API
     @PutMapping("/{postId}")
     public ResponseEntity<Post> updatePost(
         @PathVariable("postId") Long postId,
@@ -127,5 +103,10 @@ public class PostController {
             return ResponseEntity.status(404).body("게시물을 찾을 수 없습니다."); // 삭제 실패 메시지
         }
     }
-
+    
+    // 조회수 증가
+    @PostMapping("/{postId}/incrementViewCount")
+    public void incrementViewCount(@PathVariable("postId") Long postId) {
+        postService.incrementViewCount(postId);
+    }
 }

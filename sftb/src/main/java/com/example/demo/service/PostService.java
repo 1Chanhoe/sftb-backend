@@ -22,22 +22,9 @@ public class PostService {
     @Autowired
     private PostMapper postMapper;
 
-    // 게시물 작성 (파일 업로드 추가)
-    public void createPost(Post post, MultipartFile file) throws Exception {
-        logger.info("Creating a new post with title: {} by userName: {} and boardId: {}", post.getTitle(), post.getUserName(), post.getBoardId());
-
-        // 파일이 있는 경우 처리
-        if (file != null && !file.isEmpty()) {
-            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            Path filePath = Paths.get("uploads/" + fileName);
-            Files.createDirectories(filePath.getParent()); // 디렉토리 생성
-            Files.write(filePath, file.getBytes()); // 파일 저장
-            post.setFilePath(filePath.toString()); // 파일 경로 설정
-            logger.info("File saved at: {}", filePath.toString());
-        }
-
+    // 게시물 작성
+    public void createPost(Post post) {
         postMapper.insertPost(post);
-        logger.info("Post created successfully with Post_ID: {}", post.getPostId());
     }
 
     // 게시물 목록 가져오기
@@ -66,11 +53,6 @@ public class PostService {
     // 하트 수 감소
     public void decrementHeartCount(Long postId) {
         postMapper.decrementHeartCount(postId);
-    }
-
-    // 하트 갯수 가져오기
-    public int getHeartCount(Long postId) {
-        return postMapper.findHeartCountByPostId(postId);
     }
 
     // 게시물 수정
@@ -122,11 +104,16 @@ public class PostService {
         return true;
     }
 
+    //게시글 작성자 조회하기
     public String getPostAuthorId(Long postId) {
         // 게시글 조회
         Post post = getPostById(postId); // 기존에 작성된 메서드 사용
         return post.getUserId(); // 게시글 작성자 ID 반환
     }
     
+    // 조회수 증가
+    public void incrementViewCount(Long postId) {
+        postMapper.incrementViewCount(postId);
+    }
 
 }
