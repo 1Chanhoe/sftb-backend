@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.example.demo.service.UserService;
 import com.example.demo.entity.Post;
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,11 +26,39 @@ public class PostService {
     private PostMapper postMapper;
     
     @Autowired
+
+    private FileService fileService;
+    
+    @Autowired
     private UserService userService;
+    
+    @Value("${file.upload-dir}")
+    private String uploadDir; // 업로드 디렉토리 설정 값
+
+
 
 
     // 게시물 작성 (파일 업로드 추가)
+    public void createPost(Post post, MultipartFile file) throws Exception {
+        logger.info("Creating a new post with title: {} by userName: {} and boardId: {}", post.getTitle(), post.getUserName(), post.getBoardId());
+
+        // 파일이 있는 경우 처리
+        if (file != null && !file.isEmpty()) {
+            try {
+                String filePath = fileService.saveFile(file); // 변환된 파일 경로 반환
+                post.setFilePath(filePath);
+                logger.info("File saved at: {}", filePath);
+            } catch (IOException e) {
+                logger.error("File saving failed", e);
+                throw new Exception("File saving failed", e);
+            	}
+        	}
+        }
+
+        // 게시물 정보 저장
+
     public void createPost(Post post) {
+
         postMapper.insertPost(post);
     }
 
@@ -74,7 +104,10 @@ public class PostService {
         existingPost.setTitle(postDto.getTitle());
         existingPost.setContent(postDto.getContent());
         existingPost.setUpdateAt(LocalDateTime.now());
-        existingPost.setFilePath(postDto.getFilePath()); // 파일 경로 설정
+        
+        if (postDto.getFilePath() != null) {
+            existingPost.setFilePath(postDto.getFilePath()); // 파일 경로 설정
+        }
 
         // 수정된 게시글을 DB에 저장
         postMapper.updatePost(postId, postDto.getTitle(), postDto.getContent(), postDto.getFilePath());
@@ -116,9 +149,11 @@ public class PostService {
         return post.getUserId(); // 게시글 작성자 ID 반환
     }
     
+    
 
  // 관리자 채택 관련
     public Post adoptPost(Long postId, String userId, int tierExperience) {
+    	logger.info("adoptPost 서비스 메서드 호출 - postId: {}, userId: {}, tierExperience: {}", postId, userId, tierExperience);
         // 게시물 조회
         Post post = postMapper.findPostById(postId);
 

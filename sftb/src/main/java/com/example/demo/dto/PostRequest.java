@@ -9,6 +9,7 @@ public class PostRequest {
     private int boardId; // 게시판 ID 추가
     private String userId;
     private int tierExperience; // 티어 경험치 추가
+    private String filePath; //파일 경로
 
     // Getters and Setters
     public String getTitle() {
@@ -60,6 +61,13 @@ public class PostRequest {
         this.tierExperience = tierExperience;
         }
 
+	public String getFilePath() {
+		return filePath;
+	}
+
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
+	}
 	
 	// Post 객체로 변환하는 메서드
     public Post toPost() {
@@ -70,6 +78,7 @@ public class PostRequest {
         post.setBoardId(this.boardId);
         post.setViewCount(0); // 초기 조회수 설정
         post.setUserId(this.userId);
+        post.setFilePath(filePath);
         return post;
 
     }

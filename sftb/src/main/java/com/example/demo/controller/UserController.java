@@ -181,7 +181,6 @@ public class UserController {
     }
 
 
-    
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<Map<String, String>> handleBadRequest(BadRequestException ex) {
         Map<String, String> errorResponse = new HashMap<>();
