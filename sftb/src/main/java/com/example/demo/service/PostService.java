@@ -29,15 +29,16 @@ public class PostService {
 
     private FileService fileService;
     
+    @Autowired
+    private UserService userService;
+    
     @Value("${file.upload-dir}")
     private String uploadDir; // 업로드 디렉토리 설정 값
 
-    private UserService userService;
 
 
 
     // 게시물 작성 (파일 업로드 추가)
-
     public void createPost(Post post, MultipartFile file) throws Exception {
         logger.info("Creating a new post with title: {} by userName: {} and boardId: {}", post.getTitle(), post.getUserName(), post.getBoardId());
 
@@ -152,6 +153,7 @@ public class PostService {
 
  // 관리자 채택 관련
     public Post adoptPost(Long postId, String userId, int tierExperience) {
+    	logger.info("adoptPost 서비스 메서드 호출 - postId: {}, userId: {}, tierExperience: {}", postId, userId, tierExperience);
         // 게시물 조회
         Post post = postMapper.findPostById(postId);
 

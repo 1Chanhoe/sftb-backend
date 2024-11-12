@@ -24,9 +24,8 @@ public interface PostMapper {
     @Update("UPDATE post SET Title = #{title}, Content = #{content}, Update_At = NOW(), file_path = #{filePath} WHERE Post_ID = #{postId}")
     void updatePost(@Param("postId") Long postId, @Param("title") String title, @Param("content") String content, @Param("filePath") String filePath);
 
-
- // 게시글 ID로 게시글을 조회하는 메서드
-    @Select("SELECT Post_ID AS postId, Title AS title, Content AS content, " +
+    // 게시글 ID로 게시글을 조회하는 메서드
+    @Select("SELECT Post_ID AS postId, Title AS title, Content AS content, ViewCount AS viewCount, Heart AS heart," +
             "Member_ID AS memberId, Create_At AS createdAt, Update_At AS updateAt, UserID AS userId, file_path AS filePath, Adopt AS adopt " +
             "FROM post WHERE Post_ID = #{postId}")
     Post findPostById(@Param("postId") Long postId);
@@ -50,10 +49,6 @@ public interface PostMapper {
     @Update("UPDATE post SET Heart = Heart - 1 WHERE Post_ID = #{postId}")
     void decrementHeartCount(@Param("postId") Long postId);
 
-    // 하트 갯수 가져오기
-    @Select("SELECT Heart FROM post WHERE Post_ID = #{postId}")
-    int findHeartCountByPostId(@Param("postId") Long postId);
-    
     //파일 경로 조회
     @Select("SELECT file_path FROM post WHERE Post_ID = #{postId}")
     String findFilePathByPostId(Long postId);

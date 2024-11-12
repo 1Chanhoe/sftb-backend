@@ -3,6 +3,8 @@ package com.example.demo.controller;
 import com.example.demo.entity.Post;
 import com.example.demo.service.FileService;
 import com.example.demo.service.PostService;
+import com.example.demo.service.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,8 @@ import java.util.Map;
 import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,39 +35,24 @@ public class PostController {
     
     @Autowired
     private FileService fileService;
-
+    
  // 게시물 작성 (사진 파일 첨부 가능)
-    @PostMapping
+    @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<?> createPost(
-        @RequestParam("title") String title,
-        @RequestParam("content") String content,
-        @RequestParam("userName") String userName,
-        @RequestParam("boardId") Integer boardId,
-        @RequestParam("userId") String userId,
-        @RequestParam(value = "file", required = false) MultipartFile file) { // 파일 매개변수 추가
-
-        // Post 객체 생성 및 설정
-        Post post = new Post();
-        post.setTitle(title);
-        post.setContent(content);
-        post.setUserName(userName);
-        post.setBoardId(boardId);
-        post.setUserId(userId);
-        post.setViewCount(0); // 초기 조회수 설정
-
-        try {
+            @ModelAttribute PostRequest postRequest,
+            @RequestParam(value = "file", required = false) MultipartFile file)throws IOException
+    {
+    	Post post = postRequest.toPost();
+    	
             // 파일이 존재하는 경우에만 파일 저장
             if (file != null && !file.isEmpty()) {
                 String filePath = fileService.saveFile(file); // 파일 저장
                 post.setFilePath(filePath); // 저장된 파일 경로 설정
             }
+        postService.createPost(post);
+        return ResponseEntity.ok(post);
 
-            // PostService의 createPost 메서드를 호출하여 게시물 생성
-            postService.createPost(post); // 파일과 함께 게시물 생성 메서드 호출
-            return ResponseEntity.ok(post); // 성공 시 생성된 게시물을 반환
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("게시물 작성 중 오류가 발생했습니다.");
-        }
+
     }
     // 게시물 목록 가져오기 (Board_ID로 필터링)
     @GetMapping
@@ -95,7 +84,6 @@ public class PostController {
         return ResponseEntity.ok().build(); // 성공 응답 반환
     }
     
-
    
     // 게시글 수정 API
     @PutMapping("/{postId}")
@@ -140,10 +128,14 @@ public class PostController {
     @PutMapping("/{postId}/adopt")
     public ResponseEntity<Post> adoptPost(@PathVariable("postId") Long postId, @RequestBody PostRequest postRequest) { 
         try {
+        	 logger.info("adoptPost 호출 - postId: {}, userId: {}, tierExperience: {}", 
+                     postId, postRequest.getUserId(), postRequest.getTierExperience());
             // 게시물 채택 처리 및 업데이트된 게시물 정보 가져오기
             Post updatedPost = postService.adoptPost(postId, postRequest.getUserId(), postRequest.getTierExperience());
             return ResponseEntity.ok(updatedPost); // 업데이트된 게시물 정보를 반환
         } catch (Exception e) {
+        	logger.error("게시물 채택 중 오류 발생 - postId: {}, userId: {}, tierExperience: {}", 
+                    postId, postRequest.getUserId(), postRequest.getTierExperience(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // 오류 발생 시 null 반환
         }
     }
