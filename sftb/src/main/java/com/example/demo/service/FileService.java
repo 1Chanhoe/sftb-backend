@@ -30,7 +30,12 @@ public class FileService {
 
     // 파일 저장 메서드
     public String saveFile(MultipartFile file) throws IOException {
-        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename(); // 파일 이름 생성 (현재 시간 + 원본 파일명)
+    	// 파일 이름 생성 (현재 시간 + 원본 파일명)
+        String originalFilename = file.getOriginalFilename();
+        String encodedFileName = URLEncoder.encode(originalFilename, StandardCharsets.UTF_8.toString()); // URL 인코딩
+        
+        // 인코딩된 파일 이름을 사용하여 경로 설정
+        String fileName = System.currentTimeMillis() + "_" + encodedFileName; 
         Path filePath = Paths.get(uploadDir).resolve(fileName).normalize(); // 경로 설정
 
         Files.createDirectories(filePath.getParent()); // 디렉토리 생성
