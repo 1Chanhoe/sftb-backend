@@ -91,8 +91,8 @@ public class PostService {
     }
 
     // 게시물 수정
-    public Post updatePost(Long postId, PostDto postDto) {
-        logger.info("Updating post with ID: {}", postId);
+    public Post updatePost(Long postId, PostDto postDto, MultipartFile file) {
+    	logger.info("Updating post with ID: {}, Title: {}, Content: {}", postId, postDto.getTitle(), postDto.getContent());
 
         // 해당 ID의 게시글을 찾음
         Post existingPost = postMapper.findPostById(postId);
@@ -105,12 +105,29 @@ public class PostService {
         existingPost.setContent(postDto.getContent());
         existingPost.setUpdateAt(LocalDateTime.now());
         
-        if (postDto.getFilePath() != null) {
-            existingPost.setFilePath(postDto.getFilePath()); // 파일 경로 설정
+     // 파일이 새로 업로드된 경우 처리
+        if (file != null && !file.isEmpty()) {
+            // 기존 파일이 있는 경우 삭제
+            if (existingPost.getFilePath() != null && !existingPost.getFilePath().isEmpty()) {
+                fileService.deleteFile(existingPost.getFilePath()); // 기존 파일 삭제
+                logger.info("Deleted old file at path: {}", existingPost.getFilePath());
+            }
+
+            // 새 파일 저장
+            try {
+                String newFilePath = fileService.saveFile(file); // 파일을 저장하고 경로를 얻음
+                existingPost.setFilePath(newFilePath); // 새 파일 경로 설정
+            } catch (IOException e) {
+                logger.error("파일 저장 중 오류 발생:", e);
+                throw new RuntimeException("파일 저장에 실패했습니다.", e);
+            }
+        } else if (postDto.getFilePath() != null) {
+            // 새 파일이 없으면 기존 파일 경로 유지
+            existingPost.setFilePath(postDto.getFilePath());
         }
 
         // 수정된 게시글을 DB에 저장
-        postMapper.updatePost(postId, postDto.getTitle(), postDto.getContent(), postDto.getFilePath());
+        postMapper.updatePost(postId, existingPost.getTitle(), existingPost.getContent(), existingPost.getFilePath());
 
         return existingPost;
     }
@@ -131,9 +148,15 @@ public class PostService {
         if (existingPost == null) {
             throw new IllegalArgumentException("게시물이 존재하지 않습니다."); // 게시물이 없으면 예외 발생
         }
-
+        
+        // 첨부된 파일이 있는 경우 파일 삭제
+        String filePath = existingPost.getFilePath(); // 기존 게시물에서 파일 경로를 가져옴
+        if (filePath != null && !filePath.isEmpty()) {
+            fileService.deleteFile(filePath); // 파일 서비스에서 파일 삭제 메서드 호출하여 파일 삭제
+            logger.info("File at path: {} deleted successfully", filePath);
+        }
        
-        postMapper.deletePost(postId);
+        postMapper.deletePost(postId); // PostMapper에서 postId에 해당하는 게시물 삭제
         logger.info("Post with ID: {} deleted successfully", postId);
 
         // 삭제된 게시물 객체 반환

@@ -40,7 +40,7 @@ public class PostController {
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<?> createPost(
             @ModelAttribute PostRequest postRequest,
-            @RequestParam(value = "file", required = false) MultipartFile file)throws IOException
+            @RequestParam(value = "file", required = false) MultipartFile file) throws IOException
     {
     	Post post = postRequest.toPost();
     	
@@ -86,13 +86,14 @@ public class PostController {
     
    
     // 게시글 수정 API
-    @PutMapping("/{postId}")
+    @PutMapping(value = "/{postId}", consumes = "multipart/form-data")
     public ResponseEntity<Post> updatePost(
         @PathVariable("postId") Long postId,
-        @RequestBody PostDto postDto
-    ) {
+        @ModelAttribute PostDto postDto,  // PostDto 필드가 개별 파트로 전달됨
+        @RequestPart(value = "file", required = false) MultipartFile file) throws IOException
+    {
         // 게시글 수정 서비스 호출
-        Post updatedPost = postService.updatePost(postId, postDto);
+        Post updatedPost = postService.updatePost(postId, postDto, file);
         
         if (updatedPost != null) {
             return ResponseEntity.ok(updatedPost); // 수정된 게시글 객체 반환

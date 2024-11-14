@@ -36,11 +36,11 @@ public class FileService {
         Files.createDirectories(filePath.getParent()); // 디렉토리 생성
         Files.copy(file.getInputStream(), filePath); // 파일 저장
 
-     // 파일 경로를 슬래시로 변환하여 반환
+    // 파일 경로를 슬래시로 변환하여 반환
         return filePath.toString().replace("\\", "/");
     }
 
-    // 파일 경로 가져오기 메서드 - 외부 사용을 위해 Resource로 반환하도록 수정
+    // 파일 경로 가져오기 메서드 - Resource로 반환하도록 수정(외부 사용)
     public Resource loadFileAsResource(String filePath) {
         try {
             // 직접 filePath를 절대 경로로 설정
@@ -61,8 +61,24 @@ public class FileService {
         }
     }
 
- // 파일 ID로 파일 경로를 조회하는 메서드
+    // 파일 ID로 파일 경로를 조회하는 메서드 (데베 조회)
     public String getFilePathById(Long postId) {
         return postMapper.findFilePathByPostId(postId); // 데이터베이스에서 fileId로 경로 조회
+    }
+    
+    // 파일 삭제 메서드 추가
+    public void deleteFile(String filePath) {
+        try {
+            Path path = Paths.get(filePath).normalize(); // 파일 경로 설정
+            if (Files.exists(path)) {
+                Files.delete(path); // 파일이 존재하면 삭제
+                System.out.println("Deleted file: " + path.toString());
+            } else {
+                System.out.println("File not found at path: " + path.toString());
+            }
+        } catch (IOException e) {
+            System.err.println("Failed to delete file: " + filePath);
+            e.printStackTrace();
+        }
     }
 }
