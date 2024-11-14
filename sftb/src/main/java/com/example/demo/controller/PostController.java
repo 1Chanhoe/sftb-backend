@@ -1,7 +1,10 @@
 package com.example.demo.controller;
 
 import com.example.demo.entity.Post;
+import com.example.demo.service.FileService;
 import com.example.demo.service.PostService;
+import com.example.demo.service.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +16,8 @@ import java.util.Map;
 import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -27,12 +32,24 @@ public class PostController {
 
     @Autowired
     private PostService postService;
-
+    
+    @Autowired
+    private FileService fileService;
+    
  // 게시물 작성 (사진 파일 첨부 가능)
-    @PostMapping
-    public ResponseEntity<?> createPost(@RequestBody PostRequest postRequest) 
+    @PostMapping(consumes = "multipart/form-data")
+    public ResponseEntity<?> createPost(
+            @ModelAttribute PostRequest postRequest,
+            @RequestParam(value = "file", required = false) MultipartFile file) throws IOException
     {
     	Post post = postRequest.toPost();
+
+            // 파일이 존재하는 경우에만 파일 저장
+            if (file != null && !file.isEmpty()) {
+                String filePath = fileService.saveFile(file); // 파일 저장
+                post.setFilePath(filePath); // 저장된 파일 경로 설정
+            }
+
         postService.createPost(post);
         return ResponseEntity.ok(post);
     }
@@ -68,13 +85,14 @@ public class PostController {
     
    
     // 게시글 수정 API
-    @PutMapping("/{postId}")
+    @PutMapping(value = "/{postId}", consumes = "multipart/form-data")
     public ResponseEntity<Post> updatePost(
         @PathVariable("postId") Long postId,
-        @RequestBody PostDto postDto
-    ) {
+        @ModelAttribute PostDto postDto,  // PostDto 필드가 개별 파트로 전달됨
+        @RequestPart(value = "file", required = false) MultipartFile file) throws IOException
+    {
         // 게시글 수정 서비스 호출
-        Post updatedPost = postService.updatePost(postId, postDto);
+        Post updatedPost = postService.updatePost(postId, postDto, file);
         
         if (updatedPost != null) {
             return ResponseEntity.ok(updatedPost); // 수정된 게시글 객체 반환
@@ -99,7 +117,6 @@ public class PostController {
     }
     
 
-
   //특정 게시물의 세부사항 가져오기
     @GetMapping("/{postId}")
     public ResponseEntity<Post> getPostById(@PathVariable("postId") Long postId) {
@@ -111,15 +128,17 @@ public class PostController {
     @PutMapping("/{postId}/adopt")
     public ResponseEntity<Post> adoptPost(@PathVariable("postId") Long postId, @RequestBody PostRequest postRequest) { 
         try {
+        	 logger.info("adoptPost 호출 - postId: {}, userId: {}, tierExperience: {}", 
+                     postId, postRequest.getUserId(), postRequest.getTierExperience());
             // 게시물 채택 처리 및 업데이트된 게시물 정보 가져오기
             Post updatedPost = postService.adoptPost(postId, postRequest.getUserId(), postRequest.getTierExperience());
             return ResponseEntity.ok(updatedPost); // 업데이트된 게시물 정보를 반환
         } catch (Exception e) {
+        	logger.error("게시물 채택 중 오류 발생 - postId: {}, userId: {}, tierExperience: {}", 
+                    postId, postRequest.getUserId(), postRequest.getTierExperience(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // 오류 발생 시 null 반환
         }
     }
-
-
 
 
     // 조회수 증가
