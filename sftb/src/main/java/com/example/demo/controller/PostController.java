@@ -67,24 +67,7 @@ public class PostController {
 
         return ResponseEntity.ok(posts);
     }
-
-    // 게시물 하트 수 증가/감소
-    @PostMapping("/{postId}/hearts")
-    public ResponseEntity<?> updateHeartCount(@PathVariable("postId") Long postId, @RequestBody Map<String, Boolean> requestBody) {
-        Boolean heart = requestBody.get("heart"); // 클라이언트에서 보낸 하트 상태
-
-        if (heart != null && heart) {
-            // 하트가 눌린 상태 -> 하트 증가
-            postService.incrementHeartCount(postId);
-        } else {
-            // 하트가 취소된 상태 -> 하트 감소
-            postService.decrementHeartCount(postId);
-        }
-
-        return ResponseEntity.ok().build(); // 성공 응답 반환
-    }
-    
-   
+     
     // 게시글 수정 API
     @PutMapping(value = "/{postId}", consumes = "multipart/form-data")
     public ResponseEntity<Post> updatePost(
@@ -141,11 +124,10 @@ public class PostController {
         }
     }
 
-
     // 조회수 증가
     @PostMapping("/{postId}/incrementViewCount")
     public void incrementViewCount(@PathVariable("postId") Long postId) {
         postService.incrementViewCount(postId);
     }
-
+    
 }

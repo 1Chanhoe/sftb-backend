@@ -40,14 +40,6 @@ public interface PostMapper {
             "Board_ID AS boardId, Heart AS heart, UserID AS userId, file_path AS filePath " +
     		"FROM post WHERE Board_ID = #{boardId} ORDER BY Create_At DESC")
     List<Post> findPostsByBoardId(int boardId);
-    
-    // 하트 수 증가
-    @Update("UPDATE post SET Heart = Heart + 1 WHERE Post_ID = #{postId}")
-    void incrementHeartCount(@Param("postId") Long postId);
-
-    // 하트 수 감소
-    @Update("UPDATE post SET Heart = Heart - 1 WHERE Post_ID = #{postId}")
-    void decrementHeartCount(@Param("postId") Long postId);
 
     //파일 경로 조회
     @Select("SELECT file_path FROM post WHERE Post_ID = #{postId}")
