@@ -86,4 +86,9 @@ public class FileService {
             e.printStackTrace();
         }
     }
+
+    public void updateFilePath(Long postId, String filePath) {
+        postMapper.updateFilePath(postId, filePath); // 파일 경로를 null로 업데이트
+    }
+
 }
