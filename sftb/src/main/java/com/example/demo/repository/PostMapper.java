@@ -52,6 +52,11 @@ public interface PostMapper {
     // 조회수 증가 SQL
     @Update("UPDATE post SET ViewCount = ViewCount + 1 WHERE Post_ID = #{postId}")
     void incrementViewCount(Long postId);
+    
+    //파일 경로를 제거하는 쿼리를 추가
+    @Update("UPDATE post SET file_path = #{filePath} WHERE Post_ID = #{postId}")
+    void updateFilePath(@Param("postId") Long postId, @Param("filePath") String filePath);
+
 
 
 }

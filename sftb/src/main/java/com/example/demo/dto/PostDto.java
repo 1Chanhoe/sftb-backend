@@ -8,6 +8,7 @@ public class PostDto {
     private Long postId;
     private LocalDateTime updateAt; // 수정된 시간 추가
     private String filePath; // 사진 파일 경로 추가
+    private boolean deleteFile; // 파일 삭제 플래그
 
     // Getters and Setters
     public String getTitle() {
@@ -49,4 +50,12 @@ public class PostDto {
     public void setFilePath(String filePath) { 
         this.filePath = filePath;
     }
+
+	public boolean isDeleteFile() {
+		return deleteFile;
+	}
+
+	public void setDeleteFile(boolean deleteFile) {
+		this.deleteFile = deleteFile;
+	}
 }

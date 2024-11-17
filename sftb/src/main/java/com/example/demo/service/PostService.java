@@ -88,7 +88,14 @@ public class PostService {
         existingPost.setContent(postDto.getContent());
         existingPost.setUpdateAt(LocalDateTime.now());
         
-     // 파일이 새로 업로드된 경우 처리
+        // 파일 삭제 요청 플래그가 있는 경우 처리
+        if (postDto.isDeleteFile() && existingPost.getFilePath() != null) { // 삭제 요청 플래그 체크
+            fileService.deleteFile(existingPost.getFilePath()); // 기존 파일 삭제
+            existingPost.setFilePath(null); // 파일 경로 제거
+            logger.info("Deleted file at path: {}", existingPost.getFilePath());
+        }
+        
+        // 파일이 새로 업로드된 경우 처리
         if (file != null && !file.isEmpty()) {
             // 기존 파일이 있는 경우 삭제
             if (existingPost.getFilePath() != null && !existingPost.getFilePath().isEmpty()) {
