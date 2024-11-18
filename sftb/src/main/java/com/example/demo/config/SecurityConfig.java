@@ -49,6 +49,7 @@ public class SecurityConfig {
                     .requestMatchers("/api/comments/replies").permitAll()
                     .requestMatchers("/api/comments/replies/**").permitAll()
                     .requestMatchers("/uploads/**").permitAll() 
+                    .requestMatchers("/api/store/**").permitAll()
                     
                     
 
