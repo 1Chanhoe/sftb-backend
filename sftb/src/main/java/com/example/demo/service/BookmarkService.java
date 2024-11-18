@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,4 +33,9 @@ public class BookmarkService {
         Bookmark bookmark = bookmarkMapper.findByUserIdAndPostId(userId, postId);
         return bookmark != null;
     }
+    
+    public List<Long> getUserBookmarks(String userId) {
+        return bookmarkMapper.getBookmarksByUserId(userId);
+    }
+    
 }

@@ -26,7 +26,7 @@ public interface PostMapper {
 
     // 게시글 ID로 게시글을 조회하는 메서드
     @Select("SELECT Post_ID AS postId, Title AS title, Content AS content, ViewCount AS viewCount, Heart AS heart," +
-            "Member_ID AS memberId, Create_At AS createdAt, Update_At AS updateAt, UserID AS userId, file_path AS filePath, Adopt AS adopt " +
+            "Member_ID AS userName, Create_At AS createdAt, Update_At AS updateAt, UserID AS userId, file_path AS filePath, Adopt AS adopt, Board_ID AS boardId " +
             "FROM post WHERE Post_ID = #{postId}")
     Post findPostById(@Param("postId") Long postId);
 
@@ -57,6 +57,10 @@ public interface PostMapper {
     @Update("UPDATE post SET file_path = #{filePath} WHERE Post_ID = #{postId}")
     void updateFilePath(@Param("postId") Long postId, @Param("filePath") String filePath);
 
-
+    @Select("SELECT Post_ID AS postId, Title AS title, Content AS content, ViewCount AS viewCount, Heart AS heart, " +
+            "Member_ID AS userName, Create_At AS createdAt, Update_At AS updateAt, UserID AS userId, file_path AS filePath, " +
+            "Adopt AS adopt, Board_ID AS boardId " +
+            "FROM post WHERE UserID = #{userId}")
+    List<Post> getMyPosts(@Param("userId") String userId);
 
 }

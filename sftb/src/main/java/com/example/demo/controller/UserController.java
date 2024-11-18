@@ -142,24 +142,6 @@ public class UserController {
         }
     }
     
-    
-    @PutMapping("/users/{userID}/experience")
-    public ResponseEntity<?> updateUserLevelExperience(
-        @PathVariable("userID") String userID,
-        @RequestBody Map<String, Integer> request) {
-
-        logger.info("Updating experience points for userID: {}", userID);
-        
-        try {
-            int userLevelExperience = request.get("userLevelExperience");
-            userService.updateUserLevelExperience(userID, userLevelExperience);
-            return ResponseEntity.ok("Experience points updated successfully."); // 성공 메시지 반환
-        } catch (Exception e) {
-            logger.error("Failed to update experience points for userID: {}", userID, e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update experience points."); // 실패 메시지 반환
-        }
-    }
-    
     @GetMapping("/users/{userID}/experience")
     public ResponseEntity<?> getUserExperience(@PathVariable("userID") String userID) {
         try {
@@ -220,6 +202,15 @@ public class UserController {
     public ResponseEntity<List<User>> getUsers() {
         List<User> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
+    }
+    
+    @GetMapping("/users/info")
+    public ResponseEntity<User> getUserById(@RequestParam("userId") String userId) {
+        User user = userService.getUserById(userId);
+        if (user == null) {
+            return ResponseEntity.notFound().build(); // 사용자 정보가 없으면 404 반환
+        }
+        return ResponseEntity.ok(user); // 사용자 정보를 반환
     }
     
     @GetMapping("/users/{userID}/isAdmin")

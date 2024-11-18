@@ -99,4 +99,9 @@ public class CommentService {
 
         return comment; // 업데이트된 댓글 정보를 반환
     }
+    
+    public List<Comment> getMyComments(String userId) {
+        return commentMapper.getMyComments(userId);
+    }
+    
 }

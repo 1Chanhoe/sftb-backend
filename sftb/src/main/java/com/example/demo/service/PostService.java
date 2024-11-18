@@ -183,5 +183,9 @@ public class PostService {
     public void incrementViewCount(Long postId) {
         postMapper.incrementViewCount(postId);
     }
-
+    
+    public List<Post> getMyPosts(String userId) {
+        return postMapper.getMyPosts(userId);
+    }
+    
 }

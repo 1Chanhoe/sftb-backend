@@ -44,4 +44,8 @@ public interface CommentMapper {
     //채택시 Adopt True로 변환
     @Update("UPDATE comments SET Adopt = true WHERE Comment_ID = #{commentId}")
     void updateAdoptStatus(@Param("commentId") Long commentId);
+    
+    @Select("SELECT DISTINCT Post_ID FROM comments WHERE UserID = #{userId}")
+    List<Comment> getMyComments(@Param("userId") String userId);
+    
 }

@@ -1,5 +1,7 @@
 package com.example.demo.repository;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
@@ -21,4 +23,8 @@ public interface BookmarkMapper {
     // 북마크 삭제
     @Delete("DELETE FROM bookmarks WHERE UserID = #{userId} AND Post_ID = #{postId}")
     void deleteBookmark(@Param("userId") String userId, @Param("postId") Long postId);
+    
+    @Select("SELECT Post_ID FROM bookmarks WHERE UserID = #{userId}")
+    List<Long> getBookmarksByUserId(@Param("userId") String userId);
+    
 }

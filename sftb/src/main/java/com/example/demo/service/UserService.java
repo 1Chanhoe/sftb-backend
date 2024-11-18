@@ -279,4 +279,8 @@ public class UserService {
         return userMapper.findAllUsers();
     }
     
+    public User getUserById(String userId) {
+        return userMapper.getUserById(userId); // 사용자 정보를 반환
+    }
+    
 }
