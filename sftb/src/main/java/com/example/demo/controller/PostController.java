@@ -43,16 +43,15 @@ public class PostController {
             @RequestParam(value = "file", required = false) MultipartFile file) throws IOException
     {
     	Post post = postRequest.toPost();
-    	
+
             // 파일이 존재하는 경우에만 파일 저장
             if (file != null && !file.isEmpty()) {
                 String filePath = fileService.saveFile(file); // 파일 저장
                 post.setFilePath(filePath); // 저장된 파일 경로 설정
             }
+
         postService.createPost(post);
         return ResponseEntity.ok(post);
-
-
     }
     // 게시물 목록 가져오기 (Board_ID로 필터링)
     @GetMapping
