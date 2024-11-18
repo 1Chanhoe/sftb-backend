@@ -96,6 +96,8 @@ public interface UserMapper {
     // 관리자인지 여부 확인
     @Select("SELECT Manager FROM customers WHERE UserID = #{userID}")
     int getManagerStatus(@Param("userID") String userID);
-
+    
+    @Select("SELECT Tier, UserLevel, UserName, Token, Email, StudentID FROM customers WHERE UserID = #{userId}")
+    User getUserById(String userId);
 
 }

@@ -204,6 +204,15 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
     
+    @GetMapping("/users/info")
+    public ResponseEntity<User> getUserById(@RequestParam("userId") String userId) {
+        User user = userService.getUserById(userId);
+        if (user == null) {
+            return ResponseEntity.notFound().build(); // 사용자 정보가 없으면 404 반환
+        }
+        return ResponseEntity.ok(user); // 사용자 정보를 반환
+    }
+    
     @GetMapping("/users/{userID}/isAdmin")
     public ResponseEntity<Map<String, Boolean>> checkIfUserIsAdmin(@PathVariable("userID") String userID) {
         logger.info("Checking if user is an admin for userID: {}", userID);
