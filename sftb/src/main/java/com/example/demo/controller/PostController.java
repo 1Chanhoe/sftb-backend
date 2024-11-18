@@ -130,4 +130,10 @@ public class PostController {
         postService.incrementViewCount(postId);
     }
     
+    //특정 사용자의 게시글 정보 가져오기
+    @GetMapping("/myposts")
+    public List<Post> getMyPosts(@RequestParam("userId") String userId) {
+        return postService.getMyPosts(userId);
+    }
+    
 }

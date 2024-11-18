@@ -84,4 +84,11 @@ public class CommentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // 오류 발생 시 null 반환
         }
     }
+    
+    //특정 유저의 댓글에서 게시글ID 가져오기
+    @GetMapping("/mine")
+    public List<Comment> getMyComments(@RequestParam("userId") String userId) {
+        return commentService.getMyComments(userId);
+    }
+    
 }
