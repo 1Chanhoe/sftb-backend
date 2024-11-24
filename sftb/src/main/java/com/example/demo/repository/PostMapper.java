@@ -38,7 +38,7 @@ public interface PostMapper {
     @Select("SELECT Post_ID AS postId, Title AS title, Member_ID AS userName, Content AS content, " +
             "ViewCount AS viewCount, Create_At AS createAt, Update_At AS updateAt, " +
             "Board_ID AS boardId, Heart AS heart, UserID AS userId, file_path AS filePath " +
-    		"FROM post WHERE Board_ID = #{boardId} ORDER BY Create_At DESC")
+          "FROM post WHERE Board_ID = #{boardId} ORDER BY Create_At DESC")
     List<Post> findPostsByBoardId(int boardId);
 
     //파일 경로 조회
@@ -55,12 +55,12 @@ public interface PostMapper {
     
     //파일 경로를 제거하는 쿼리를 추가
     @Update("UPDATE post SET file_path = #{filePath} WHERE Post_ID = #{postId}")
-    void updateFilePath(@Param("postId") Long postId, @Param("filePath") String filePath);
+    void updateFilePath(@Param("postId") Long postId, @Param("filePath") String fileName);
 
     @Select("SELECT Post_ID AS postId, Title AS title, Content AS content, ViewCount AS viewCount, Heart AS heart, " +
             "Member_ID AS userName, Create_At AS createdAt, Update_At AS updateAt, UserID AS userId, file_path AS filePath, " +
             "Adopt AS adopt, Board_ID AS boardId " +
             "FROM post WHERE UserID = #{userId}")
     List<Post> getMyPosts(@Param("userId") String userId);
-
+    
 }

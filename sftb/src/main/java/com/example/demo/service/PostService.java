@@ -35,22 +35,23 @@ public class PostService {
     @Value("${file.upload-dir}")
     private String uploadDir; // 업로드 디렉토리 설정 값
 
-    // 게시물 작성 (파일 업로드 추가)
-    public void createPost(Post post, MultipartFile file) throws Exception {
+ // 게시물 작성 (다중 파일 업로드 지원)
+    public void createPost(Post post, List<MultipartFile> files) throws Exception {
         logger.info("Creating a new post with title: {} by userName: {} and boardId: {}", post.getTitle(), post.getUserName(), post.getBoardId());
-        
-        // 파일이 있는 경우 처리
-        if (file != null && !file.isEmpty()) {
-            try {
-                String filePath = fileService.saveFile(file); // 변환된 파일 경로 반환
-                post.setFilePath(filePath);
-                logger.info("File saved at: {}", filePath);
-            } catch (IOException e) {
-                logger.error("File saving failed", e);
-                throw new Exception("File saving failed", e);
-            	}
-        	}
+
+        // 1. 게시물 저장 (postId 생성)
+        postMapper.insertPost(post);
+
+        // 2. 파일 저장 및 파일 경로 삽입
+        if (files != null && !files.isEmpty()) {
+            for (MultipartFile file : files) {
+                String filePath = fileService.saveFile(file, post.getPostId()); // 파일 저장
+                postMapper.updateFilePath(post.getPostId(), filePath); // DB에 파일 경로 업데이트
+            }
         }
+
+        logger.info("Post created with ID: {}", post.getPostId());
+    }
 
     // 게시물 정보 저장
     public void createPost(Post post) {
@@ -73,53 +74,39 @@ public class PostService {
         return posts;
     }
 
-    // 게시물 수정
-    public Post updatePost(Long postId, PostDto postDto, MultipartFile file) {
-    	logger.info("Updating post with ID: {}, Title: {}, Content: {}", postId, postDto.getTitle(), postDto.getContent());
+    // 게시물 수정 (다중 파일 처리)
+    public Post updatePost(Long postId, PostDto postDto, List<MultipartFile> files) throws IOException {
+        logger.info("Updating post with ID: {}, Title: {}, Content: {}", postId, postDto.getTitle(), postDto.getContent());
 
-        // 해당 ID의 게시글을 찾음
+        // 1. 게시물 조회
         Post existingPost = postMapper.findPostById(postId);
         if (existingPost == null) {
             throw new IllegalArgumentException("게시물이 존재하지 않습니다.");
         }
 
-        // PostDto에서 받은 데이터를 Post 엔티티에 직접 업데이트
+        // 2. 게시물 내용 업데이트
         existingPost.setTitle(postDto.getTitle());
         existingPost.setContent(postDto.getContent());
         existingPost.setUpdateAt(LocalDateTime.now());
-        
-        // 파일 삭제 요청 플래그가 있는 경우 처리
-        if (postDto.isDeleteFile() && existingPost.getFilePath() != null) { // 삭제 요청 플래그 체크
-            fileService.deleteFile(existingPost.getFilePath()); // 기존 파일 삭제
-            existingPost.setFilePath(null); // 파일 경로 제거
-            logger.info("Deleted file at path: {}", existingPost.getFilePath());
-        }
-        
-        // 파일이 새로 업로드된 경우 처리
-        if (file != null && !file.isEmpty()) {
-            // 기존 파일이 있는 경우 삭제
-            if (existingPost.getFilePath() != null && !existingPost.getFilePath().isEmpty()) {
-                fileService.deleteFile(existingPost.getFilePath()); // 기존 파일 삭제
-                logger.info("Deleted old file at path: {}", existingPost.getFilePath());
+
+        // 3. 기존 파일 삭제 및 새 파일 저장
+        if (files != null && !files.isEmpty()) {
+            // 기존 파일 삭제
+            String oldFilePath = fileService.getFilePathById(postId);
+            if (oldFilePath != null) {
+                fileService.deleteFile(oldFilePath);
             }
 
             // 새 파일 저장
-            try {
-                String newFilePath = fileService.saveFile(file); // 파일을 저장하고 경로를 얻음
-                existingPost.setFilePath(newFilePath); // 새 파일 경로 설정
-            } catch (IOException e) {
-                logger.error("파일 저장 중 오류 발생:", e);
-                throw new RuntimeException("파일 저장에 실패했습니다.", e);
+            for (MultipartFile file : files) {
+                fileService.saveFile(file, postId); // 새 파일 저장 및 데이터베이스 경로 업데이트
             }
-        } else if (postDto.getFilePath() != null) {
-            // 새 파일이 없으면 기존 파일 경로 유지
-            existingPost.setFilePath(postDto.getFilePath());
         }
-        // 수정된 게시글을 DB에 저장
-        postMapper.updatePost(postId, existingPost.getTitle(), existingPost.getContent(), existingPost.getFilePath());
+
+        // 4. 게시물 업데이트
+        postMapper.updatePost(postId, existingPost.getTitle(), existingPost.getContent(), null);
         return existingPost;
     }
-
     // 게시물 ID로 조회
     public Post getPostById(Long postId) {
         logger.info("Fetching post with ID: {}", postId);
@@ -130,25 +117,26 @@ public class PostService {
         return post;
     }
     
-    // 게시글 삭제
+ // 게시물 삭제
     public Post deletePost(Long postId) {
-        // 해당 ID의 게시글을 찾음
+        logger.info("Deleting post with ID: {}", postId);
+
+        // 1. 게시물 조회
         Post existingPost = postMapper.findPostById(postId);
         if (existingPost == null) {
-            throw new IllegalArgumentException("게시물이 존재하지 않습니다."); // 게시물이 없으면 예외 발생
+            throw new IllegalArgumentException("게시물이 존재하지 않습니다.");
         }
-        
-        // 첨부된 파일이 있는 경우 파일 삭제
-        String filePath = existingPost.getFilePath(); // 기존 게시물에서 파일 경로를 가져옴
-        if (filePath != null && !filePath.isEmpty()) {
-            fileService.deleteFile(filePath); // 파일 서비스에서 파일 삭제 메서드 호출하여 파일 삭제
-            logger.info("File at path: {} deleted successfully", filePath);
+
+        // 2. 파일 삭제
+        String filePath = fileService.getFilePathById(postId);
+        if (filePath != null) {
+            fileService.deleteFile(filePath); // 파일 삭제
         }
-       
-        postMapper.deletePost(postId); // PostMapper에서 postId에 해당하는 게시물 삭제
+
+        // 3. 게시물 삭제
+        postMapper.deletePost(postId);
         logger.info("Post with ID: {} deleted successfully", postId);
 
-        // 삭제된 게시물 객체 반환
         return existingPost;
     }
 
@@ -161,7 +149,7 @@ public class PostService {
         
  // 관리자 채택 관련
     public Post adoptPost(Long postId, String userId, int tierExperience) {
-    	logger.info("adoptPost 서비스 메서드 호출 - postId: {}, userId: {}, tierExperience: {}", postId, userId, tierExperience);
+       logger.info("adoptPost 서비스 메서드 호출 - postId: {}, userId: {}, tierExperience: {}", postId, userId, tierExperience);
         // 게시물 조회
         Post post = postMapper.findPostById(postId);
 

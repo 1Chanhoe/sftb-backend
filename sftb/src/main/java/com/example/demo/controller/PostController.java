@@ -6,6 +6,7 @@ import com.example.demo.service.PostService;
 import com.example.demo.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,6 +22,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -36,23 +39,22 @@ public class PostController {
     @Autowired
     private FileService fileService;
     
- // 게시물 작성 (사진 파일 첨부 가능)
+ // 게시물 작성
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<?> createPost(
             @ModelAttribute PostRequest postRequest,
-            @RequestParam(value = "file", required = false) MultipartFile file) throws IOException
-    {
-    	Post post = postRequest.toPost();
-    	
-            // 파일이 존재하는 경우에만 파일 저장
-            if (file != null && !file.isEmpty()) {
-                String filePath = fileService.saveFile(file); // 파일 저장
-                post.setFilePath(filePath); // 저장된 파일 경로 설정
-            }
-        postService.createPost(post);
-        return ResponseEntity.ok(post);
+            @RequestParam(value = "file", required = false) MultipartFile file) throws IOException {
 
+        Post post = postRequest.toPost();
 
+        try {
+            // 게시물 저장
+            postService.createPost(post, file != null ? List.of(file) : null); // 단일 파일 처리
+            return ResponseEntity.ok(post);
+        } catch (Exception e) {
+            logger.error("Error creating post", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("게시물 작성 중 오류가 발생했습니다.");
+        }
     }
     // 게시물 목록 가져오기 (Board_ID로 필터링)
     @GetMapping
@@ -68,20 +70,23 @@ public class PostController {
         return ResponseEntity.ok(posts);
     }
      
-    // 게시글 수정 API
+ // 게시물 수정
     @PutMapping(value = "/{postId}", consumes = "multipart/form-data")
     public ResponseEntity<Post> updatePost(
-        @PathVariable("postId") Long postId,
-        @ModelAttribute PostDto postDto,  // PostDto 필드가 개별 파트로 전달됨
-        @RequestPart(value = "file", required = false) MultipartFile file) throws IOException
-    {
-        // 게시글 수정 서비스 호출
-        Post updatedPost = postService.updatePost(postId, postDto, file);
-        
-        if (updatedPost != null) {
-            return ResponseEntity.ok(updatedPost); // 수정된 게시글 객체 반환
-        } else {    
-            return ResponseEntity.status(404).body(null); // 게시글이 존재하지 않음
+            @PathVariable("postId") Long postId,
+            @ModelAttribute PostDto postDto,
+            @RequestParam(value = "file", required = false) MultipartFile file) {
+
+        try {
+            // 게시물 수정 및 파일 갱신
+            Post updatedPost = postService.updatePost(postId, postDto, file != null ? List.of(file) : null);
+            return ResponseEntity.ok(updatedPost);
+        } catch (IllegalArgumentException e) {
+            logger.error("Post not found: {}", postId, e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception e) {
+            logger.error("Error updating post", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
     
@@ -112,13 +117,13 @@ public class PostController {
     @PutMapping("/{postId}/adopt")
     public ResponseEntity<Post> adoptPost(@PathVariable("postId") Long postId, @RequestBody PostRequest postRequest) { 
         try {
-        	 logger.info("adoptPost 호출 - postId: {}, userId: {}, tierExperience: {}", 
+            logger.info("adoptPost 호출 - postId: {}, userId: {}, tierExperience: {}", 
                      postId, postRequest.getUserId(), postRequest.getTierExperience());
             // 게시물 채택 처리 및 업데이트된 게시물 정보 가져오기
             Post updatedPost = postService.adoptPost(postId, postRequest.getUserId(), postRequest.getTierExperience());
             return ResponseEntity.ok(updatedPost); // 업데이트된 게시물 정보를 반환
         } catch (Exception e) {
-        	logger.error("게시물 채택 중 오류 발생 - postId: {}, userId: {}, tierExperience: {}", 
+           logger.error("게시물 채택 중 오류 발생 - postId: {}, userId: {}, tierExperience: {}", 
                     postId, postRequest.getUserId(), postRequest.getTierExperience(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // 오류 발생 시 null 반환
         }
@@ -135,5 +140,31 @@ public class PostController {
     public List<Post> getMyPosts(@RequestParam("userId") String userId) {
         return postService.getMyPosts(userId);
     }
+    @GetMapping("/{postId}/file")
+    public ResponseEntity<Resource> downloadFile(@PathVariable("postId") Long postId) {
+        try {
+            // 게시물 ID로 파일 경로 가져오기
+            String filePath = fileService.getFilePathById(postId);
+            if (filePath == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+
+            // 리소스 로드
+            Resource resource = fileService.loadFileAsResource(filePath);
+
+            if (resource == null || !resource.exists()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+
+            // 다운로드 응답 생성
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + "\"")
+                    .body(resource);
+        } catch (Exception e) {
+            logger.error("Error downloading file", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
     
 }

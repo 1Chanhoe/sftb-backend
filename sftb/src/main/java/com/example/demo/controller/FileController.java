@@ -2,9 +2,15 @@ package com.example.demo.controller;
 
 import com.example.demo.service.FileService;
 
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Base64;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,6 +24,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class FileController {
 
     private final FileService fileService;
+    
+    @Value("${file.upload-dir}")
+    private String uploadDir; // 파일 저장 경로
+
 
     public FileController(FileService fileService) {
         this.fileService = fileService;
@@ -26,7 +36,7 @@ public class FileController {
     // 이미지 파일을 제공하는 API
     @GetMapping("/{postId}")
     public ResponseEntity<Resource> getFileById(@PathVariable("postId") Long postId) {
-    	
+       
         // 데이터베이스에서 파일 경로 조회
         String filePath = fileService.getFilePathById(postId);
         System.out.println("File path for postId " + postId + ": " + filePath); // 파일 경로 조회 로그
@@ -79,5 +89,36 @@ public class FileController {
             return ResponseEntity.internalServerError().build(); // 오류 시 500 반환
         }
     }
+    
+    @GetMapping("/download/{postId}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable("postId") Long postId) {
+        // 데이터베이스에서 파일 이름 조회
+        String fileName = fileService.getFilePathById(postId);
+        if (fileName == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // 저장된 파일 경로 생성
+        Path filePath = Paths.get(uploadDir).resolve(fileName).normalize();
+
+        try {
+            Resource resource = new UrlResource(filePath.toUri());
+            if (resource.exists()) {
+                // Content-Disposition 헤더 설정
+                String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString());
+                String contentDisposition = "attachment; filename*=UTF-8''" + encodedFileName;
+
+                return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
+                    .body(resource);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
 
 }

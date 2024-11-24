@@ -2,6 +2,7 @@ package com.example.demo.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "post") // 테이블 이름을 'post'로 지정
@@ -39,7 +40,7 @@ public class Post {
     // 추가된 부분: 파일 경로 필드
     @Column(name = "file_path")
     private String filePath;
-
+    
     // Getter and Setter for filePath
 
     @Column(name = "UserID")
@@ -163,4 +164,5 @@ public class Post {
     public void setAdopt(boolean adopt) {
         this.adopt = adopt;
     }
+    
 }

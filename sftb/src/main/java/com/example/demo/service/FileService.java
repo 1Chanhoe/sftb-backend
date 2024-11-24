@@ -15,12 +15,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 
 @Service
 public class FileService {
-	
-	
+   
+   
 
     @Value("${file.upload-dir}") // 파일 저장 디렉토리 경로를 설정 파일에서 가져옴
     private String uploadDir;
@@ -28,22 +29,27 @@ public class FileService {
     @Autowired
     private PostMapper postMapper;
 
-    // 파일 저장 메서드
-    public String saveFile(MultipartFile file) throws IOException {
-    	// 파일 이름 생성 (현재 시간 + 원본 파일명)
+    public String saveFile(MultipartFile file, Long postId) throws IOException {
+        // 원본 파일명 가져오기
         String originalFilename = file.getOriginalFilename();
-        String encodedFileName = URLEncoder.encode(originalFilename, StandardCharsets.UTF_8.toString()); // URL 인코딩
-        
-        // 인코딩된 파일 이름을 사용하여 경로 설정
-        String fileName = System.currentTimeMillis() + "_" + encodedFileName; 
-        Path filePath = Paths.get(uploadDir).resolve(fileName).normalize(); // 경로 설정
 
-        Files.createDirectories(filePath.getParent()); // 디렉토리 생성
-        Files.copy(file.getInputStream(), filePath); // 파일 저장
+        // 저장 경로 설정
+        Path filePath = Paths.get(uploadDir).resolve(originalFilename).normalize();
 
-    // 파일 경로를 슬래시로 변환하여 반환
+        // 디렉토리 생성
+        Files.createDirectories(filePath.getParent());
+
+        // 파일 저장
+        Files.copy(file.getInputStream(), filePath);
+
+        // 데이터베이스에 파일 경로 업데이트
+        postMapper.updateFilePath(postId, originalFilename); // 파일 이름만 저장
+
+        // 저장된 파일 경로 반환
         return filePath.toString().replace("\\", "/");
     }
+
+
 
     // 파일 경로 가져오기 메서드 - Resource로 반환하도록 수정(외부 사용)
     public Resource loadFileAsResource(String filePath) {
@@ -90,5 +96,6 @@ public class FileService {
     public void updateFilePath(Long postId, String filePath) {
         postMapper.updateFilePath(postId, filePath); // 파일 경로를 null로 업데이트
     }
+    
 
 }
