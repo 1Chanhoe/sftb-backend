@@ -141,7 +141,7 @@ public class UserService {
         String currentTier = userMapper.getTier(userID); // 현재 티어 조회
         
         // 티어 변경 로직
-        if (currentTier.equals("사장") && userLevel >= 90 && currentTierExperience + newTierExperience >= 100) {
+        if (currentTier.equals("사장") && userLevel >= 999 && currentTierExperience + newTierExperience >= 100) {
             // 티어를 사장으로 변경
             userMapper.updateTier(userID, "이사"); // "이사"로 업데이트
             userMapper.updateToken(userID, 5000); // Token 필드에 5000 추가 (승진 시 추가할 Token)
@@ -150,43 +150,43 @@ public class UserService {
         else if (currentTier.equals("전무") && userLevel >= 80 && currentTierExperience + newTierExperience >= 100) {
             // 티어를 사장으로 변경
             userMapper.updateTier(userID, "사장"); // "사장"으로 업데이트
-            userMapper.updateToken(userID, 5000); // Token 필드에 5000 추가 (승진 시 추가할 Token)
+            userMapper.updateToken(userID, 4500); // Token 필드에 5000 추가 (승진 시 추가할 Token)
             newTierExperience -= 100; // 티어 경험치 -100
         }
         else if (currentTier.equals("부장") && userLevel >= 70 && currentTierExperience + newTierExperience >= 100) {
             // 티어를 전무로 변경
             userMapper.updateTier(userID, "전무"); // "전무"로 업데이트
-            userMapper.updateToken(userID, 5000); // Token 필드에 5000 추가 (승진 시 추가할 Token)
+            userMapper.updateToken(userID, 4000); // Token 필드에 5000 추가 (승진 시 추가할 Token)
             newTierExperience -= 100; // 티어 경험치 -100
         }
         else if (currentTier.equals("차장") && userLevel >= 60 && currentTierExperience + newTierExperience >= 100) {
             // 티어를 부장으로 변경
-            userMapper.updateTier(userID, "부장"); // "차장"으로 업데이트
-            userMapper.updateToken(userID, 5000); // Token 필드에 5000 추가 (승진 시 추가할 Token)
+            userMapper.updateTier(userID, "부장"); // "부장"으로 업데이트
+            userMapper.updateToken(userID, 3500); // Token 필드에 5000 추가 (승진 시 추가할 Token)
             newTierExperience -= 100; // 티어 경험치 -100
         }
         else if (currentTier.equals("과장") && userLevel >= 50 && currentTierExperience + newTierExperience >= 100) {
             // 티어를 차장으로 변경
             userMapper.updateTier(userID, "차장"); // "차장"으로 업데이트
-            userMapper.updateToken(userID, 5000); // Token 필드에 5000 추가 (승진 시 추가할 Token)
+            userMapper.updateToken(userID, 3000); // Token 필드에 5000 추가 (승진 시 추가할 Token)
             newTierExperience -= 100; // 티어 경험치 -100
         }
         else if (currentTier.equals("대리") && userLevel >= 40 && currentTierExperience + newTierExperience >= 100) {
             // 티어를 과장으로 변경
             userMapper.updateTier(userID, "과장"); // "과장"으로 업데이트
-            userMapper.updateToken(userID, 5000); // Token 필드에 5000 추가 (승진 시 추가할 Token)
+            userMapper.updateToken(userID, 2500); // Token 필드에 5000 추가 (승진 시 추가할 Token)
             newTierExperience -= 100; // 티어 경험치 -100
         }
         else if (currentTier.equals("주임") && userLevel >= 30 && currentTierExperience + newTierExperience >= 100) {
             // 티어를 대리로 변경
             userMapper.updateTier(userID, "대리"); // "대리"로 업데이트
-            userMapper.updateToken(userID, 5000); // Token 필드에 5000 추가 (승진 시 추가할 Token)
+            userMapper.updateToken(userID, 2000); // Token 필드에 5000 추가 (승진 시 추가할 Token)
             newTierExperience -= 100; // 티어 경험치 -100
         }
           else if (currentTier.equals("사원") && userLevel >= 20 && currentTierExperience + newTierExperience >= 100) {
             // 티어를 주임으로 변경
             userMapper.updateTier(userID, "주임"); // "주임"으로 업데이트
-            userMapper.updateToken(userID, 3000); // Token 필드에 3000 추가(승진 시 추가할 Token)
+            userMapper.updateToken(userID, 1500); // Token 필드에 3000 추가(승진 시 추가할 Token)
             newTierExperience -= 100; // 티어 경험치 -100
         } else if (currentTier.equals("인턴") && userLevel >= 10 && currentTierExperience + newTierExperience >= 100 ) {
             // 티어를 사원으로 변경

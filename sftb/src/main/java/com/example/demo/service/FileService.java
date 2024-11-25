@@ -32,9 +32,12 @@ public class FileService {
     public String saveFile(MultipartFile file, Long postId) throws IOException {
         // 원본 파일명 가져오기
         String originalFilename = file.getOriginalFilename();
-
+        
+        // UUID를 사용하여 고유한 파일 이름 생성
+        String uniqueFilename = UUID.randomUUID().toString() + "_" + originalFilename;
+        
         // 저장 경로 설정
-        Path filePath = Paths.get(uploadDir).resolve(originalFilename).normalize();
+        Path filePath = Paths.get(uploadDir).resolve(uniqueFilename).normalize();
 
         // 디렉토리 생성
         Files.createDirectories(filePath.getParent());
@@ -43,7 +46,7 @@ public class FileService {
         Files.copy(file.getInputStream(), filePath);
 
         // 데이터베이스에 파일 경로 업데이트
-        postMapper.updateFilePath(postId, originalFilename); // 파일 이름만 저장
+        postMapper.updateFilePath(postId, uniqueFilename); // 파일 이름만 저장
 
         // 저장된 파일 경로 반환
         return filePath.toString().replace("\\", "/");

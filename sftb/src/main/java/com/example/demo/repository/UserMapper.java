@@ -10,7 +10,8 @@ import java.util.List;
 @Mapper
 public interface UserMapper {
     // 사용자 삽입
-    @Insert("INSERT INTO customers (UserID, StudentID, Password, UserName, Email, NewMember,  UserLevel_Experience) VALUES (#{userID}, #{studentID}, #{password}, #{userName}, #{email}, #{newMember}, #{userLevelExperience})")
+    @Insert("INSERT INTO customers (UserID, StudentID, Password, UserName, Email, NewMember,  UserLevel_Experience) "
+    		+ "VALUES (#{userID}, #{studentID}, #{password}, #{userName}, #{email}, #{newMember}, #{userLevelExperience})")
     void insertUser(User user);
 
     // UserID로 사용자 검색
