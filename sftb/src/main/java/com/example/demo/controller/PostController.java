@@ -77,9 +77,11 @@ public class PostController {
             @ModelAttribute PostDto postDto,
             @RequestParam(value = "file", required = false) MultipartFile file) {
 
-        try {
-            // 게시물 수정 및 파일 갱신
-            Post updatedPost = postService.updatePost(postId, postDto, file != null ? List.of(file) : null);
+    	try {
+            // 게시물 수정 및 파일 처리
+            Post updatedPost = postService.updatePost(postId, postDto, file);
+
+            // 성공적으로 수정된 게시물을 반환
             return ResponseEntity.ok(updatedPost);
         } catch (IllegalArgumentException e) {
             logger.error("Post not found: {}", postId, e);

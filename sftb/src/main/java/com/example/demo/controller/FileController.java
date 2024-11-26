@@ -4,6 +4,7 @@ import com.example.demo.service.FileService;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Base64;
@@ -50,19 +51,29 @@ public class FileController {
 
         if (resource != null && resource.exists()) {
             try {
-                // 파일 이름을 UTF-8로 인코딩하여 Base64로 변환
-                String encodedFileName = Base64.getEncoder().encodeToString(resource.getFilename().getBytes(StandardCharsets.UTF_8));
+                // 파일 MIME 타입 설정
+                Path path = Paths.get(filePath).normalize(); // 파일 경로 객체 생성
+                String mimeType = Files.probeContentType(path); // MIME 타입 가져오기
+                if (mimeType == null) {
+                    mimeType = "application/octet-stream"; // 기본 MIME 타입 설정
+                }
+
+                System.out.println("MIME type: " + mimeType); // 디버깅용 로그
+
+                // 파일 이름 UTF-8로 인코딩
+                String encodedFileName = URLEncoder.encode(resource.getFilename(), StandardCharsets.UTF_8.toString());
                 String contentDisposition = "inline; filename*=UTF-8''" + encodedFileName;
 
                 return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
+                    .header(HttpHeaders.CONTENT_TYPE, mimeType) // Content-Type 헤더 추가
                     .body(resource);
             } catch (Exception e) {
                 e.printStackTrace();
-                return ResponseEntity.internalServerError().build();
+                return ResponseEntity.internalServerError().build(); // 오류 시 500 반환
             }
         } else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.notFound().build(); // 파일이 없으면 404 반환
         }
     }
     

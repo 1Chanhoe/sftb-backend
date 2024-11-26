@@ -74,8 +74,8 @@ public class PostService {
         return posts;
     }
 
-    // 게시물 수정 (다중 파일 처리)
-    public Post updatePost(Long postId, PostDto postDto, List<MultipartFile> files) throws IOException {
+ // 게시물 수정 (단일 파일 처리)
+    public Post updatePost(Long postId, PostDto postDto, MultipartFile file) throws IOException {
         logger.info("Updating post with ID: {}, Title: {}, Content: {}", postId, postDto.getTitle(), postDto.getContent());
 
         // 1. 게시물 조회
@@ -89,24 +89,30 @@ public class PostService {
         existingPost.setContent(postDto.getContent());
         existingPost.setUpdateAt(LocalDateTime.now());
 
-        // 3. 기존 파일 삭제 및 새 파일 저장
-        if (files != null && !files.isEmpty()) {
+        // 3. 파일 경로 처리
+        String updatedFilePath = existingPost.getFilePath(); // 기존 파일 경로 유지
+
+        if (file != null && !file.isEmpty()) {
             // 기존 파일 삭제
-            String oldFilePath = fileService.getFilePathById(postId);
-            if (oldFilePath != null) {
-                fileService.deleteFile(oldFilePath);
+            if (updatedFilePath != null) {
+                fileService.deleteFile(updatedFilePath); // 기존 파일 삭제
             }
 
             // 새 파일 저장
-            for (MultipartFile file : files) {
-                fileService.saveFile(file, postId); // 새 파일 저장 및 데이터베이스 경로 업데이트
-            }
+            updatedFilePath = fileService.saveFile(file, postId); // 새 파일 저장
         }
 
         // 4. 게시물 업데이트
-        postMapper.updatePost(postId, existingPost.getTitle(), existingPost.getContent(), null);
+        existingPost.setFilePath(updatedFilePath); // 파일 경로 반영
+        postMapper.updatePost(postId, existingPost.getTitle(), existingPost.getContent(), updatedFilePath);
+
+        logger.info("Updated Post filePath: {}", updatedFilePath);
+        
+     // 5. 최종 게시물 반환
         return existingPost;
     }
+
+
     // 게시물 ID로 조회
     public Post getPostById(Long postId) {
         logger.info("Fetching post with ID: {}", postId);
